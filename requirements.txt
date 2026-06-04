@@ -1,0 +1,14 @@
+# Core harness has ZERO required deps (lexical matcher + MockNLA run as-is).
+# Install extras for stronger matching / real NLAs:
+
+# strongest concept-presence matcher (recommended for real evals)
+sentence-transformers>=2.2
+
+# wordnet matcher fallback (lighter than embeddings)
+nltk>=3.8
+
+# local kitft NLA checkpoints (Path B)
+torch>=2.2
+transformers>=4.44
+safetensors>=0.4
+# sglang[all]>=0.5.6   # only if routing AV through nla_inference.NLAClient
