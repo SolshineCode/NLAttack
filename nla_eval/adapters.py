@@ -86,58 +86,103 @@ class CallableNLA(NLA):
 # --------------------------------------------------------------------------
 
 class NeuronpediaNLA(NLA):
-    """Adapter for Neuronpedia's hosted NLAs at neuronpedia.org/nla.
+    """Adapter for Neuronpedia's hosted NLAs (POST /api/nla/explain).
 
-    Neuronpedia exposes an interpretability API (OpenAPI/Scalar at /api-doc,
-    JS-rendered so not fetchable statically). The request/response *shape* below
-    matches Neuronpedia's activation-style endpoints; CONFIRM the exact path and
-    field names against the live Scalar docs or the `neuronpedia` Python client,
-    then adjust the two marked lines. Everything else is correct.
+    VERIFIED against the live API (no key required; rate-limited 120 req/hr/IP).
+    Discover (modelId, nlaSourceId) pairs via GET /api/nla/sources. As of the
+    last check:
+        gemma-3-27b-it  / kitft-l41   (Gemma NLA, layer 41, kitft/nla-gemma3-27b)
+        llama3.3-70b-it / kitft-l53   (Llama NLA, layer 53)
 
-    Auth: set api_key (header `x-api-key`) — get one from your Neuronpedia account.
+    /api/nla/explain returns a natural-language `description` (the AV
+    verbalization) per requested token position. The harness "bottleneck text"
+    is the concatenation of those per-position descriptions; concept-survival =
+    does that text mention concept C.
+
+    Because explain takes <=16 positions and is rate-limited, reconstruct() does
+    one bootstrap call (position 0) to learn prompt_length, then explains up to
+    `max_positions` evenly-spaced token positions in one batched call.
+
+    encode() returns nothing useful here (no activation vector is exposed), but
+    per-position `cosine_similarity`/`mse` (activation-space faithfulness) are
+    captured in `self.last_faithfulness` for optional confidence weighting.
     """
 
     name = "neuronpedia-nla"
 
     def __init__(
         self,
-        model_id: str = "gemma-2-2b",          # or "llama3.3-70b-it"
-        layer: int = 12,
+        model_id: str = "gemma-3-27b-it",
+        nla_source_id: str = "kitft-l41",
         api_key: Optional[str] = None,
         base_url: str = "https://www.neuronpedia.org/api",
-        path: str = "/nla/verbalize",          # <-- CONFIRM against /api-doc
+        max_positions: int = 16,
+        temperature: float = 0.7,
+        timeout: int = 120,
+        retry_on_429: int = 2,
     ):
-        self.name = f"neuronpedia:{model_id}-L{layer}"
+        self.name = f"neuronpedia:{model_id}/{nla_source_id}"
         self.model_id = model_id
-        self.layer = layer
+        self.nla_source_id = nla_source_id
         self.api_key = api_key
         self.base_url = base_url.rstrip("/")
-        self.path = path
+        self.max_positions = min(max_positions, 16)
+        self.temperature = temperature
+        self.timeout = timeout
+        self.retry_on_429 = retry_on_429
+        self.last_faithfulness: list = []
 
-    def reconstruct(self, text: str) -> str:
+    def _explain(self, text: str, positions):
         import json
+        import time
         import urllib.request
+        import urllib.error
 
-        body = json.dumps(
-            {"model": self.model_id, "layer": self.layer, "text": text}  # <-- CONFIRM fields
-        ).encode()
+        body = json.dumps({
+            "modelId": self.model_id,
+            "nlaSourceId": self.nla_source_id,
+            "text": text,
+            "positions": list(positions),
+            "temperature": self.temperature,
+        }).encode()
         req = urllib.request.Request(
-            self.base_url + self.path,
+            self.base_url + "/nla/explain",
             data=body,
             headers={
                 "Content-Type": "application/json",
                 **({"x-api-key": self.api_key} if self.api_key else {}),
             },
         )
-        with urllib.request.urlopen(req, timeout=120) as r:
-            payload = json.loads(r.read())
-        # AV verbalization key — CONFIRM against live response:
-        return (
-            payload.get("verbalization")
-            or payload.get("description")
-            or payload.get("text")
-            or ""
-        )
+        attempt = 0
+        while True:
+            try:
+                with urllib.request.urlopen(req, timeout=self.timeout) as r:
+                    return json.loads(r.read())
+            except urllib.error.HTTPError as e:
+                if e.code == 429 and attempt < self.retry_on_429:
+                    attempt += 1
+                    time.sleep(2 ** attempt)
+                    continue
+                raise
+
+    @staticmethod
+    def _sample_positions(prompt_length: int, k: int):
+        if prompt_length <= k:
+            return list(range(prompt_length))
+        step = prompt_length / k
+        return sorted({min(prompt_length - 1, int(i * step)) for i in range(k)})
+
+    def reconstruct(self, text: str) -> str:
+        boot = self._explain(text, [0])
+        plen = int(boot.get("prompt_length", 1))
+        positions = self._sample_positions(plen, self.max_positions)
+        data = self._explain(text, positions) if positions != [0] else boot
+        results = data.get("results", [])
+        self.last_faithfulness = [
+            {"position": r.get("position"), "cosine_similarity": r.get("cosine_similarity"),
+             "mse": r.get("mse")} for r in results
+        ]
+        return "\n".join(r.get("description", "") for r in results)
 
 
 # --------------------------------------------------------------------------

@@ -24,7 +24,7 @@ class MyNLA(NLA):
 
 Ready-made adapters in `adapters.py`:
 - `MockNLA` — deps-free lossy filter, for testing the harness itself.
-- `NeuronpediaNLA` — hosted NLAs at neuronpedia.org/nla (`gemma-2-2b`, `llama3.3-70b-it`). HTTP; confirm the endpoint path against the live Scalar docs (two marked lines).
+- `NeuronpediaNLA` — **verified live** against `POST /api/nla/explain` (no API key needed; 120 req/hr/IP). Sources via `GET /api/nla/sources`: `gemma-3-27b-it`/`kitft-l41` (Gemma) and `llama3.3-70b-it`/`kitft-l53`. The bottleneck text = concatenated per-position AV `description`s. Run `python test_neuronpedia_live.py`.
 - `KitftNLA` — local AV/AR checkpoints from `kitft/natural_language_autoencoders` (`kitft/nla-{base}-L{layer}-av`). Grabs the host-model activation, then verbalizes.
 - `CallableNLA` — wrap any `fn(str)->str`.
 
