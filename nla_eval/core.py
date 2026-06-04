@@ -34,6 +34,10 @@ class ConceptRow:
     matched_term: Optional[str]
     similarity: float
     mode: str
+    cos_sim: Optional[float] = None   # AR activation-space faithfulness (Neuronpedia)
+    mse: Optional[float] = None       # AR reconstruction error
+    fallback_full: bool = False       # concept token not locatable -> matched whole text
+    agreement: Optional[float] = None # ensemble matcher agreement fraction (if used)
     meta: Dict[str, Any] = field(default_factory=dict)
 
     def flat(self) -> Dict[str, Any]:
@@ -72,18 +76,43 @@ def run(
     dataset: List[Example],
     matcher: Optional[Matcher] = None,
     detect_insertions: bool = True,
+    concept_targeted: bool = True,
 ) -> RunResult:
+    """Run a dataset through an NLA into the retention table.
+
+    If the adapter exposes `verbalize_concepts(text, concepts)` and
+    `concept_targeted` is on, each concept is matched against the verbalization
+    of ITS OWN token positions (the faithful floor test: does the concept's
+    activation verbalize as the concept, or launder into a neighbor?). The
+    whole-example text (`__full__`) is still used for insertion detection.
+    Otherwise we fall back to one reconstruct() per example.
+    """
     matcher = matcher or Matcher()
-    texts = [ex.text for ex in dataset]
-    outs = nla.reconstruct_batch(texts)
-    recon = {ex.id: out for ex, out in zip(dataset, outs)}
+    use_targeted = concept_targeted and hasattr(nla, "verbalize_concepts")
 
     rows: List[ConceptRow] = []
     insertions: List[InsertionRow] = []
-    for ex, out in zip(dataset, outs):
-        input_concept_words = {w for c in ex.concepts for w in content_words(c)}
+    recon: Dict[str, str] = {}
+
+    def _text_of(entry, default=""):
+        return entry.get("text", default) if isinstance(entry, dict) else (entry or default)
+
+    for ex in dataset:
+        if use_targeted:
+            per = nla.verbalize_concepts(ex.text, ex.concepts)
+            full = _text_of(per.get("__full__"))
+        else:
+            full = nla.reconstruct(ex.text)
+            per = {c: full for c in ex.concepts}
+        recon[ex.id] = full
+
         for c in ex.concepts:
-            m = matcher.match(c, out)
+            entry = per.get(c, full)
+            text = _text_of(entry, full)
+            cos = entry.get("cos") if isinstance(entry, dict) else None
+            mse = entry.get("mse") if isinstance(entry, dict) else None
+            fb = entry.get("fallback_full", False) if isinstance(entry, dict) else False
+            m = matcher.match(c, text)
             rows.append(
                 ConceptRow(
                     example_id=ex.id,
@@ -93,11 +122,16 @@ def run(
                     matched_term=m.matched_term,
                     similarity=m.similarity,
                     mode=m.mode,
+                    cos_sim=cos,
+                    mse=mse,
+                    fallback_full=fb,
+                    agreement=getattr(m, "agreement", None),
                     meta=ex.meta,
                 )
             )
         if detect_insertions:
-            for w in set(content_words(out)) - input_concept_words:
+            input_concept_words = {w for c in ex.concepts for w in content_words(c)}
+            for w in set(content_words(full)) - input_concept_words:
                 insertions.append(InsertionRow(ex.id, nla.name, w, ex.meta))
 
     return RunResult(nla.name, rows, insertions, recon)
@@ -125,3 +159,32 @@ def group_retention(rows: List[ConceptRow], key) -> Dict[Any, float]:
     for r in rows:
         groups.setdefault(key(r), []).append(r)
     return {k: retention_rate(v) for k, v in sorted(groups.items(), key=lambda kv: str(kv[0]))}
+
+
+def contested_rate(rows: List[ConceptRow]) -> float:
+    """Fraction of concepts where matcher topologies DISAGREE (0 < agreement < 1).
+    High = the retention/laundering signal is matcher-dependent and should not be
+    claimed as an NLA property without probe ground truth (Hermes P0 #2)."""
+    scored = [r for r in rows if r.agreement is not None]
+    if not scored:
+        return float("nan")
+    return sum(1 for r in scored if 0.0 < r.agreement < 1.0) / len(scored)
+
+
+def mean_faithfulness(rows: List[ConceptRow], predicate=lambda r: True) -> float:
+    vals = [r.cos_sim for r in rows if predicate(r) and r.cos_sim is not None]
+    return (sum(vals) / len(vals)) if vals else float("nan")
+
+
+def faithfulness_weighted_retention(rows: List[ConceptRow], default: float = 1.0) -> float:
+    """Retention with each concept weighted by AR faithfulness (cos_sim, clamped
+    to [0,1]). A 'retained' concept whose activation was reconstructed poorly
+    (low cos) counts less — it may be a verbalizer artifact, not real survival.
+    Rows without a faithfulness score use `default`. Addresses Hermes P1#5."""
+    num = den = 0.0
+    for r in rows:
+        w = default if r.cos_sim is None else max(0.0, min(1.0, r.cos_sim))
+        den += w
+        if r.status in ("retained", "substituted"):
+            num += w
+    return (num / den) if den else float("nan")

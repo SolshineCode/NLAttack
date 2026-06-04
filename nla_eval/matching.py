@@ -57,14 +57,20 @@ class Matcher:
         self.backend = backend
         self._st = None  # sentence-transformers model
         self._wn = None  # wordnet handle
+        # Dependency-free backends are always honored as requested.
+        if backend in ("lexical", "fuzzy", "overlap"):
+            self.backend = backend
+            return
         if backend in ("auto", "embedding"):
             self._try_embedding()
         if self._st is None and backend in ("auto", "wordnet"):
             self._try_wordnet()
-        if self._st is None and self._wn is None:
-            self.backend = "lexical"
-        elif backend == "auto":
-            self.backend = "embedding" if self._st is not None else "wordnet"
+        if self._st is not None:
+            self.backend = "embedding"
+        elif self._wn is not None:
+            self.backend = "wordnet"
+        else:
+            self.backend = "lexical"  # requested embedding/wordnet unavailable
 
     def _try_embedding(self):
         try:
@@ -111,6 +117,33 @@ class Matcher:
                 return Match(concept, True, sh, 0.65, "synonym")
         return Match(concept, False, None, 0.0, "none")
 
+    def _fuzzy_match(self, concept: str, out_words: List[str]) -> Match:
+        """Character-level fuzzy topology (difflib) — a DIFFERENT similarity
+        geometry from lexical-substring, so it contributes a real independent
+        vote to the ensemble without any dependency."""
+        import difflib
+
+        head = concept.lower().split()[-1] if concept.strip() else concept.lower()
+        best, best_r = None, 0.0
+        for w in out_words:
+            r = difflib.SequenceMatcher(None, head, w).ratio()
+            if r > best_r:
+                best, best_r = w, r
+        if best_r >= 0.99:
+            return Match(concept, True, best, best_r, "exact")
+        if best_r >= 0.78:
+            return Match(concept, True, best, best_r, "fuzzy")
+        return Match(concept, False, best, best_r, "none")
+
+    def _overlap_match(self, concept: str, out_tokens: Set[str]) -> Match:
+        """Token-overlap topology: any content word of the concept present as a
+        whole token in the output. Stricter than substring, looser than fuzzy."""
+        cwords = [w for w in content_words(concept)]
+        for w in cwords:
+            if w in out_tokens:
+                return Match(concept, True, w, 1.0, "exact")
+        return Match(concept, False, None, 0.0, "none")
+
     def _embedding_match(self, concept: str, out_words: List[str]) -> Match:
         if not out_words:
             return Match(concept, False, None, 0.0, "none")
@@ -137,4 +170,75 @@ class Matcher:
             return self._embedding_match(concept, out_words)
         if self.backend == "wordnet":
             return self._wordnet_match(concept, out_tokens, out_text)
+        if self.backend == "fuzzy":
+            return self._fuzzy_match(concept, out_words)
+        if self.backend == "overlap":
+            return self._overlap_match(concept, out_tokens)
         return self._lexical(concept, out_tokens, out_text)
+
+
+@dataclass
+class EnsembleMatch:
+    """Consensus across several matcher topologies. `agreement` is the fraction
+    of matchers that called the concept present. Duck-compatible with Match
+    (status/matched_term/similarity/mode) so it drops into core.run unchanged."""
+    concept: str
+    present: bool
+    matched_term: Optional[str]
+    similarity: float          # = agreement fraction
+    mode: str                  # "ensemble"
+    agreement: float
+    verdicts: dict             # backend_name -> Match
+
+    @property
+    def status(self) -> str:
+        if not self.present:
+            return "dropped"
+        # substituted if the majority that found it did so non-exactly
+        nonexact = sum(1 for m in self.verdicts.values()
+                       if m.present and m.mode not in ("exact",))
+        exact = sum(1 for m in self.verdicts.values()
+                    if m.present and m.mode == "exact")
+        return "retained" if exact >= nonexact else "substituted"
+
+
+class EnsembleMatcher:
+    """Run several matcher topologies and require >threshold agreement before
+    calling a concept present. Directly addresses the Hermes P0 'matcher topology
+    = NLA topology' confound: an effect that only one topology sees is suspect.
+
+    Default backends are all dependency-free (lexical, fuzzy, overlap). Pass
+    `extra=["embedding","wordnet"]` to add those when installed; unavailable
+    backends are silently dropped (they fall back to lexical, which we detect
+    and exclude to avoid double-counting)."""
+
+    def __init__(self, backends=("lexical", "fuzzy", "overlap"),
+                 extra=(), threshold: float = 0.5, emb_threshold: float = 0.55):
+        self.threshold = threshold
+        self.matchers = {}
+        for b in list(backends) + list(extra):
+            m = Matcher(backend=b, threshold=emb_threshold)
+            # Matcher falls back to "lexical" if a requested backend is missing;
+            # don't register a duplicate lexical under another name.
+            if b not in ("lexical",) and m.backend == "lexical":
+                continue
+            self.matchers[b] = m
+
+    @property
+    def backend(self) -> str:
+        return "ensemble(" + ",".join(self.matchers) + ")"
+
+    def match(self, concept: str, output_text: str) -> EnsembleMatch:
+        verdicts = {name: m.match(concept, output_text) for name, m in self.matchers.items()}
+        n = len(verdicts) or 1
+        present_votes = [v for v in verdicts.values() if v.present]
+        agreement = len(present_votes) / n
+        present = agreement > self.threshold
+        matched = None
+        if present_votes:
+            # modal matched term among the positive votes
+            from collections import Counter
+            matched = Counter(v.matched_term for v in present_votes if v.matched_term).most_common(1)
+            matched = matched[0][0] if matched else None
+        return EnsembleMatch(concept, present, matched, agreement, "ensemble",
+                             agreement, verdicts)

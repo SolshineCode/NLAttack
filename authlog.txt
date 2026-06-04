@@ -1,0 +1,33 @@
+Script started on 2026-06-04 15:49:20-07:00 [COMMAND="hermes auth add nous --type oauth --no-browser < /dev/null" <not executed on terminal>]
+
+Found existing Nous OAuth credentials at /home/caleb/.hermes/shared/nous_auth.json
+Import these credentials? [Y/n]: Rehydrating Nous session from shared credentials...
+Could not refresh shared credentials — falling back to device-code login.
+Starting Hermes login via Nous Portal...
+Portal: https://portal.nousresearch.com
+
+To continue:
+  1. Open: https://portal.nousresearch.com/manage-subscription?user_code=CUW8-3GH3
+  2. If prompted, enter code: CUW8-3GH3
+Waiting for approval (polling every 1s)...
+Traceback (most recent call last):
+  File "/home/caleb/.local/bin/hermes", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/caleb/.hermes/hermes-agent/hermes_cli/main.py", line 12211, in main
+    args.func(args)
+  File "/home/caleb/.hermes/hermes-agent/hermes_cli/main.py", line 5347, in cmd_auth
+    auth_command(args)
+  File "/home/caleb/.hermes/hermes-agent/hermes_cli/auth_commands.py", line 700, in auth_command
+    auth_add_command(args)
+  File "/home/caleb/.hermes/hermes-agent/hermes_cli/auth_commands.py", line 289, in auth_add_command
+    creds = auth_mod._nous_device_code_login(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/caleb/.hermes/hermes-agent/hermes_cli/auth.py", line 5174, in _nous_device_code_login
+    token_data = _poll_for_token(
+                 ^^^^^^^^^^^^^^^^
+  File "/home/caleb/.hermes/hermes-agent/hermes_cli/auth.py", line 2817, in _poll_for_token
+    raise TimeoutError("Timed out waiting for device authorization")
+TimeoutError: Timed out waiting for device authorization
+
+Script done on 2026-06-04 15:59:26-07:00 [COMMAND_EXIT_CODE="1"]
