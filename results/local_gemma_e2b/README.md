@@ -39,6 +39,28 @@ mean AUC ≈ **0.695** → barely above chance; balanced accuracy ≈ baseline.
 3. The probe side is **CPU-only** (cached activations + sklearn), so it runs even
    while the GPU is busy with other work.
 
+## Probe vs AV gap (AV side — GPU, run 2026-06-04, n=100, av_v0_1_aux_readout)
+
+The full disentanglement: `probe_acc` (bottleneck ground truth) vs `av_acc`
+(end-to-end AV verbalizer + ensemble matcher recovering true concept presence).
+
+| concept | probe_acc | av_acc | gap = verbalizer+matcher loss |
+|---|---|---|---|
+| report | 0.919 | 0.580 | **0.339** |
+| company | 0.925 | 0.600 | **0.325** |
+| earnings | 0.925 | 0.600 | **0.325** |
+
+**~0.33 of the apparent concept loss is attributable to the verbalizer + matcher,
+NOT the NLA bottleneck.** The bottleneck holds the concept (probe ~0.92); the AV
+text + matcher only recover ~0.58–0.60 of it. This is precisely the confound the
+Hermes review (P0 #1) said would invalidate naive AV-text retention claims — now
+measured, not assumed. Raw verbalizations in `av_verbalizations.jsonl`.
+
+(Note: `av_v0_1_aux_readout/block_to000100` is an early 100-step checkpoint; the
+AV emits empty/degenerate text on some inputs — a v8-side training-maturity issue.
+A later checkpoint or the Neuronpedia gemma3-27b AV would likely narrow the gap;
+the *method* is what's validated here.)
+
 ## Honest caveats
 
 - **n = 2 concepts per corpus.** The keyword-prevalence auto-selector (15–85%

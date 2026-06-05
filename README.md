@@ -52,6 +52,31 @@ Each is a `group-by` over the retention table; tags come from `Example.meta`.
 
 `*` = scaffolded via the same retention table + meta tags; add the tagged dataset to activate. The starred ones are the frontier/expected-null tests — run them, don't lean on them.
 
+## Validity layer (from the Hermes design review — see `DESIGN_REVIEW.md`)
+
+A skeptical review (Hermes `nemotron-3-ultra`) flagged that the raw retention
+signal is confounded: the AV verbalizer and the matcher are two extra lossy
+filters. These additions subtract that confound:
+
+- **Bottleneck probes** (`nla_eval/bottleneck_probe.py`) — the deepest fix.
+  Train a linear probe on the NLA's activation (the true bottleneck) for ground-
+  truth concept presence, independent of verbalizer/matcher. `probe_acc −
+  av_matcher_acc = verbalizer+matcher loss`. Demonstrated on a local Gemma-4-E2B
+  NLA: in-distribution concepts probe at ~0.99 AUC, OOD at ~0.70 — the bottleneck
+  is *not* a uniform filter. See `results/local_gemma_e2b/`.
+- **Matcher ensemble** (`EnsembleMatcher`) — vote across topologies
+  (lexical/fuzzy/overlap [+embedding/wordnet]); only >threshold agreement counts.
+  `ConceptRow.agreement` + `contested_rate()` expose matcher-dependent (suspect)
+  effects.
+- **Faithfulness weighting** (`faithfulness_weighted_retention`) — down-weight
+  "survived" concepts whose activation was reconstructed poorly, using the
+  `cosine_similarity`/`mse` the Neuronpedia API already returns.
+- **Frequency+length matched controls** (`nla_eval/controls.py`) — for every test.
+- **Adaptive red-team** (`nla_eval/redteam.py`) — compositional blind spots +
+  query-budgeted evasion search; static i.i.d. tests miss adaptive attackers.
+- **Local NLA adapter** (`nla_eval/local_gemma_e2b.py`) — activation→AV
+  verbalization for a local Gemma-4-E2B NLA (full activation access for probes).
+
 ## Honest limits
 
 - **Concept matching is the weak link.** Embedding backend recommended; always
