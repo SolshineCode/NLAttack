@@ -63,7 +63,15 @@ filters. These additions subtract that confound:
   truth concept presence, independent of verbalizer/matcher. `probe_acc −
   av_matcher_acc = verbalizer+matcher loss`. Demonstrated on a local Gemma-4-E2B
   NLA: in-distribution concepts probe at ~0.99 AUC, OOD at ~0.70 — the bottleneck
-  is *not* a uniform filter. See `results/local_gemma_e2b/`.
+  is *not* a uniform filter. See `results/local_gemma_e2b/`. Each probe carries a
+  **label-permutation null control** (`ProbeResult.signal`) so a high AUC at small
+  n can't be mistaken for overfit noise.
+- **Rudimentary-NLA floor tooling** (`nla_eval/rudimentary.py`) — for evaluating
+  *weaker/tinier* NLAs (degenerate AV, near-random AR), where end-to-end metrics
+  collapse. `bottleneck_exists` (does any signal clear the noise floor?),
+  `identity_leakage_vectors/_text` (is the AR/AV conditioned on input at all?),
+  `fit_forced_verbalizer` (read the bottleneck via probes when the AV is empty).
+  See `plans/RUDIMENTARY_TIERS.md` for which plans to run first vs shelve.
 - **Matcher ensemble** (`EnsembleMatcher`) — vote across topologies
   (lexical/fuzzy/overlap [+embedding/wordnet]); only >threshold agreement counts.
   `ConceptRow.agreement` + `contested_rate()` expose matcher-dependent (suspect)

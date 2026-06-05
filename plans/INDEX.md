@@ -4,6 +4,10 @@
 
 **Feasibility mix:** high=32 · medium=53 · frontier=14 · mixed=1 (P037, high+frontier)
 
+> **Evaluating a small/weak NLA?** See **`RUDIMENTARY_TIERS.md`** for the run-first /
+> skip / floor-version triage (from the dual review), and **`reviews/SUMMARY.md`**
+> for the consolidated critique. Tier-1 plans map to `nla_eval/rudimentary.py`.
+
 
 ## Family A — Concept-survival & dropout-map  (`A_*.md`)
 
