@@ -120,6 +120,7 @@ class NeuronpediaNLA(NLA):
         temperature: float = 0.7,
         timeout: int = 120,
         retry_on_429: int = 2,
+        retry_on_gateway: int = 4,
     ):
         self.name = f"neuronpedia:{model_id}/{nla_source_id}"
         self.model_id = model_id
@@ -130,7 +131,13 @@ class NeuronpediaNLA(NLA):
         self.temperature = temperature
         self.timeout = timeout
         self.retry_on_429 = retry_on_429
+        self.retry_on_gateway = retry_on_gateway
         self.last_faithfulness: list = []
+        self.last_truncated = 0
+
+    # gateway codes worth retrying — the NLA inference server is on RunPod and
+    # cold-starts with 502/503/504; 429 is the documented rate limit.
+    _RETRY_CODES = (429, 502, 503, 504)
 
     def _explain(self, text: str, positions):
         import json
@@ -154,35 +161,100 @@ class NeuronpediaNLA(NLA):
             },
         )
         attempt = 0
+        max_attempts = max(self.retry_on_429, self.retry_on_gateway)
         while True:
             try:
                 with urllib.request.urlopen(req, timeout=self.timeout) as r:
                     return json.loads(r.read())
             except urllib.error.HTTPError as e:
-                if e.code == 429 and attempt < self.retry_on_429:
+                if e.code in self._RETRY_CODES and attempt < max_attempts:
                     attempt += 1
-                    time.sleep(2 ** attempt)
+                    time.sleep(min(30, 3 * (2 ** (attempt - 1))))  # 3,6,12,24,30s
+                    continue
+                raise
+            except urllib.error.URLError:
+                if attempt < max_attempts:
+                    attempt += 1
+                    time.sleep(min(30, 3 * (2 ** (attempt - 1))))
                     continue
                 raise
 
-    @staticmethod
-    def _sample_positions(prompt_length: int, k: int):
-        if prompt_length <= k:
-            return list(range(prompt_length))
-        step = prompt_length / k
-        return sorted({min(prompt_length - 1, int(i * step)) for i in range(k)})
-
-    def reconstruct(self, text: str) -> str:
+    def _explain_body_positions(self, text: str):
+        """One bootstrap (pos 0) to learn prompt_length, then explain the body
+        positions 1..min(prompt_length-1, max_positions). Position 0 is the BOS
+        token whose verbalization is reliably global-prior noise, so it is
+        excluded. Returns the list of result records (token + description +
+        faithfulness per position)."""
         boot = self._explain(text, [0])
         plen = int(boot.get("prompt_length", 1))
-        positions = self._sample_positions(plen, self.max_positions)
-        data = self._explain(text, positions) if positions != [0] else boot
+        if plen <= 1:
+            return boot.get("results", [])
+        positions = list(range(1, min(plen, 1 + self.max_positions)))
+        if plen - 1 > self.max_positions:
+            self.last_truncated = plen - 1 - self.max_positions  # logged by caller
+        data = self._explain(text, positions)
         results = data.get("results", [])
         self.last_faithfulness = [
-            {"position": r.get("position"), "cosine_similarity": r.get("cosine_similarity"),
-             "mse": r.get("mse")} for r in results
+            {"position": r.get("position"),
+             "cosine_similarity": r.get("cosine_similarity"), "mse": r.get("mse")}
+            for r in results
         ]
+        return results
+
+    def reconstruct(self, text: str) -> str:
+        """Whole-example bottleneck text (all body positions). Used for
+        insertion/hallucination detection and reconstruct-only callers."""
+        results = self._explain_body_positions(text)
         return "\n".join(r.get("description", "") for r in results)
+
+    @staticmethod
+    def _norm_tok(tok: str) -> str:
+        return "".join(ch for ch in (tok or "").lower() if ch.isalnum())
+
+    @staticmethod
+    def _mean(vals):
+        vals = [v for v in vals if v is not None]
+        return (sum(vals) / len(vals)) if vals else None
+
+    def _pack(self, recs):
+        """Bundle a set of position-records into {text, cos, mse, positions}.
+        cos/mse are the AR activation-space faithfulness at those positions —
+        how trustworthy this verbalization is (Hermes review P1#5 / item B)."""
+        return {
+            "text": "\n".join(r.get("description", "") for r in recs),
+            "cos": self._mean([r.get("cosine_similarity") for r in recs]),
+            "mse": self._mean([r.get("mse") for r in recs]),
+            "positions": [r.get("position") for r in recs],
+        }
+
+    def verbalize_concepts(self, text: str, concepts):
+        """Concept-targeted verbalization: explain the body once, then for each
+        concept return the descriptions at the token positions that make up that
+        concept (so we test whether the concept's OWN activations verbalize as
+        the concept, vs launder into a neighbor). Falls back to the full text for
+        any concept whose tokens can't be located.
+
+        Returns {concept: {text, cos, mse, positions[, fallback_full]}} plus a
+        "__full__" entry over all body positions (used for insertion detection).
+        """
+        from .matching import content_words
+
+        results = self._explain_body_positions(text)
+        out = {}
+        for c in concepts:
+            cwords = [self._norm_tok(w) for w in content_words(c)]
+            hits = [r for r in results
+                    if (lambda nt: nt and any(
+                        (nt in w or w in nt) and min(len(nt), len(w)) >= 3
+                        for w in cwords))(self._norm_tok(r.get("token", "")))]
+            if hits:
+                out[c] = self._pack(hits)
+            else:
+                entry = self._pack(results)      # whole-text fallback
+                entry["fallback_full"] = True
+                out[c] = entry
+        out["__full__"] = self._pack(results)
+        return out
 
 
 # --------------------------------------------------------------------------
