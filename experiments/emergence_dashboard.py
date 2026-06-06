@@ -39,12 +39,14 @@ def load(parquet):
     return texts, X
 
 
-def one(parquet, generic, seed=0, group_ids=None, X=None, texts=None):
+def one(parquet, generic, seed=0, group_ids=None, X=None, texts=None, min_concepts=8):
     if X is None:
         texts, X = load(parquet)
     cands = (CANDIDATES + GENERIC) if generic else CANDIDATES
     concepts = auto_select_concepts(texts, cands, min_prev=0.12, max_prev=0.88)
-    rep = E.run_emergence(X, texts, concepts, group_ids=group_ids, seed=seed)
+    rep = E.run_capability(X, texts, concepts, group_ids=group_ids,
+                           min_concepts=min_concepts, seed=seed)
+    rep.profile_ci = E.bootstrap_profile(X, texts, concepts, min_concepts=min_concepts, seed=seed)
     return rep, concepts
 
 
@@ -77,19 +79,24 @@ def main():
         curve = []
         for lab, p in zip(labels, args.sweep):
             rep, concepts = one(p, args.generic)
-            row = {"label": lab, "index": rep.index, "confident": rep.confident,
-                   "verdict": rep.label}
+            row = {"label": lab, "tier": rep.tier, "profile": rep.profile,
+                   "verdict": rep.tier_label}
             for a in rep.axes:
                 row[a.name] = a.score
             curve.append(row)
-            print(f"== {lab} ==  index={rep.index:.3f}  {rep.label}")
+            print(f"== {lab} ==  Tier {rep.tier} ({rep.tier_label})  profile={rep.profile:.3f}")
             print(rep.table()); print()
-        (OUT / f"emergence_curve{args.out_suffix}.json").write_text(json.dumps(curve, indent=2))
-        print("\nEMERGENCE CURVE (index by checkpoint):")
+        verdict = E.emergence_from_curve(curve)
+        (OUT / f"emergence_curve{args.out_suffix}.json").write_text(
+            json.dumps({"curve": curve, "emergence": E.asdict_safe(verdict)
+                        if hasattr(E, "asdict_safe") else verdict.__dict__}, indent=2, default=str))
+        print("\nEMERGENCE CURVE (tier / profile by checkpoint):")
         for r in curve:
-            bar = "#" * int(max(0, r["index"]) * 40)
-            print(f"  {r['label']:10s} {r['index']:.3f} |{bar}")
-        print(f"\nwrote {OUT/('emergence_curve'+args.out_suffix+'.json')}")
+            bar = "#" * int(max(0, r["profile"]) * 40 if r["profile"] == r["profile"] else 0)
+            print(f"  {r['label']:10s} T{r['tier']} {r['profile']:.3f} |{bar}")
+        print(f"\nEMERGENCE VERDICT: emerged={verdict.emerged}  point={verdict.emergence_point}  "
+              f"monotone_rise={verdict.monotone_rise}")
+        print(f"wrote {OUT/('emergence_curve'+args.out_suffix+'.json')}")
         return
 
     if not args.parquet:
@@ -108,8 +115,9 @@ def _save(rep, stem: Path):
         for a in rep.axes:
             w.writerow(a.flat())
     Path(str(stem) + ".json").write_text(json.dumps(
-        {"index": rep.index, "n_available": rep.n_available, "confident": rep.confident,
-         "label": rep.label, "axes": [a.flat() for a in rep.axes]}, indent=2))
+        {"tier": rep.tier, "tier_label": rep.tier_label, "profile": rep.profile,
+         "profile_ci": rep.profile_ci, "n_concepts": rep.n_concepts, "reasons": rep.reasons,
+         "axes": [a.flat() for a in rep.axes]}, indent=2))
     print(f"\nwrote {stem}.csv / .json")
 
 
