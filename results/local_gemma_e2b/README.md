@@ -16,6 +16,8 @@ ground-truth concept presence = keyword in the source text. A linear probe
 | team   | 0.979 | 0.934 | 0.627 | 448 |
 
 mean AUC ≈ **0.988** → the bottleneck encodes these concepts almost perfectly.
+Both clear their **label-permutation null control** (control AUC ≈ 0.50 ± 0.04,
+`signal=True`) — so this is genuine encoded signal, not small-n overfit.
 
 **Out-of-distribution (diverse web, `fineweb_edu_chunk1`, n=800):**
 
