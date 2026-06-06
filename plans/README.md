@@ -39,6 +39,7 @@ Each plan is falsifiable, weak-NLA-aware, and maps to the harness (`nla_eval/`).
 | H | P071–P080 | **Faithfulness / AR-fidelity** — cosine/MSE vs survival, error-weighted retention, AR concept drift in activation space, round-trip stability |
 | I | P081–P090 | **Distributional / OOD / training-dependence** — encodable-subspace in-vs-OOD, domain transfer, frequency-tier interactions, checkpoint maturity, cross-model transfer |
 | J | P091–P100 | **Calibration / uncertainty / self-knowledge** — does the bottleneck encode its own uncertainty, abstention handling, hallucinated specificity over gaps, ambiguity preservation |
+| K | P101–P106 | **Emergence & additive capability index** — sufficiency, selectivity, graded encoding, abstraction transfer, effective rank, and the additive Emergence Index that sums the null-gated axes (`nla_eval/emergence.py`) |
 
 ## Feasibility legend
 - **high** — runnable today on a weak NLA with the current harness (often CPU/probe-side).
