@@ -27,6 +27,19 @@ all CPU, no working AV required).
 Cross-cutting requirement for ALL Tier-1 probe work: report the **permutation
 control** (`ProbeResult.signal`) — never an absolute AUC alone.
 
+## Detecting EMERGENCE (the most nuanced use) — Family K + the dashboard
+
+For watching capability *lift off the floor* in a super-weak/tiny NLA, run the
+additive **Emergence Index** (`nla_eval/emergence.py`,
+`experiments/emergence_dashboard.py`) — it composes the null-gated axes:
+decodability (P081) · sufficiency (P101) · selectivity (P102) · content-adjacency
+(P011) · faithful-rank (P080) · stability (P044) · dose-response (P086) · graded
+(P103) · abstraction (P104) · effective-rank (P105) → composite (P106). Every axis
+carries its own null margin and the index is gated on decodability clearing the
+permutation floor, so a high score can't come from overfit/degeneracy. Sweep
+checkpoints (`--sweep`) for the emergence curve; the most sensitive trio at the
+floor is **stability (P044), faithful-rank (P080), dose-response (P086)**.
+
 ## Tier 3 — SKIP until the NLA is stronger (both reviewers' "skip")
 
 Expected pure-null on a rudimentary NLA — needs relational binding, multi-stage

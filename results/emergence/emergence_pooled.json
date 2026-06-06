@@ -1,0 +1,88 @@
+{
+  "index": 0.49271147586314895,
+  "n_available": 6,
+  "confident": true,
+  "label": "early emergence: real, selective, partly stable signal",
+  "axes": [
+    {
+      "name": "decodability",
+      "available": true,
+      "raw": 0.9392924237197251,
+      "null": 0.5,
+      "margin": 0.3880545070653463,
+      "score": 0.9701362676633657
+    },
+    {
+      "name": "sufficiency",
+      "available": true,
+      "raw": 7.943198027697089e-05,
+      "null": 0.0,
+      "margin": 7.943198027697089e-05,
+      "score": 0.33359810660092326
+    },
+    {
+      "name": "selectivity",
+      "available": true,
+      "raw": 0.16522177091252802,
+      "null": 0.0,
+      "margin": 0.16522177091252802,
+      "score": 0.4720622026072229
+    },
+    {
+      "name": "content_adjacency",
+      "available": false,
+      "raw": NaN,
+      "null": NaN,
+      "margin": NaN,
+      "score": NaN
+    },
+    {
+      "name": "faithful_rank",
+      "available": false,
+      "raw": NaN,
+      "null": NaN,
+      "margin": NaN,
+      "score": NaN
+    },
+    {
+      "name": "stability",
+      "available": true,
+      "raw": 0.7757114455073829,
+      "null": 0.029271142705362452,
+      "margin": 0.7464403028020205,
+      "score": 0.7689482973786893
+    },
+    {
+      "name": "dose_response",
+      "available": false,
+      "raw": NaN,
+      "null": NaN,
+      "margin": NaN,
+      "score": NaN
+    },
+    {
+      "name": "graded_encoding",
+      "available": false,
+      "raw": NaN,
+      "null": NaN,
+      "margin": NaN,
+      "score": NaN
+    },
+    {
+      "name": "abstraction",
+      "available": true,
+      "raw": 0.5219899029907559,
+      "null": 0.5,
+      "margin": 0.021989902990755872,
+      "score": 0.043979805981511744
+    },
+    {
+      "name": "effective_rank",
+      "available": true,
+      "raw": 2.757623126847599,
+      "null": 3.0,
+      "margin": 0.2423768731524012,
+      "score": 0.24237687403121289
+    }
+  ]
+}

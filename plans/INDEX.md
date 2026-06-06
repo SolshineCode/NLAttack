@@ -1,12 +1,11 @@
-# NLA Evaluation Plans — Master Index (P001–P100)
+# NLA Evaluation Plans — Master Index (P001–P112)
 
-100 plans across 10 families. Schema + family themes: see `README.md`. Feasibility: high (runnable now) · medium (modest new code / working AV) · frontier (expected-null / stretch on weak NLAs).
+112 plans across 12 families. Schema + themes: see `README.md`. Feasibility: high / medium / frontier.
 
-**Feasibility mix:** high=32 · medium=53 · frontier=14 · mixed=1 (P037, high+frontier)
+**Feasibility mix:** high=40 · medium=56 · frontier=15 · mixed=1 (P037)
 
-> **Evaluating a small/weak NLA?** See **`RUDIMENTARY_TIERS.md`** for the run-first /
-> skip / floor-version triage (from the dual review), and **`reviews/SUMMARY.md`**
-> for the consolidated critique. Tier-1 plans map to `nla_eval/rudimentary.py`.
+> Small/weak NLA? see `RUDIMENTARY_TIERS.md`. Emergence detection: Family K + `nla_eval/emergence.py`.
+> Literature basis: `../docs/LITERATURE.md`; integration + new plans (Family L): `../docs/LITERATURE_INTEGRATION.md`.
 
 
 ## Family A — Concept-survival & dropout-map  (`A_*.md`)
@@ -158,3 +157,25 @@
 | P098 | Numeric / range uncertainty preservation | medium |
 | P099 | Known-unknown vs unknown-unknown distinction | frontier |
 | P100 | Self-consistency across resamples as a confidence proxy | medium |
+
+## Family K — Emergence & additive capability index  (`K_*.md`)
+
+| ID | Title | Feasibility |
+|----|-------|-------------|
+| P101 | Sufficiency: incremental decodability over trivial input features | high |
+| P102 | Selectivity: confound-subtracted decodability | high |
+| P103 | Graded / ordinal encoding (continuum, not just binary) | high |
+| P104 | Abstraction transfer (cross-context, not memorized) | high |
+| P105 | Effective-rank sweet spot (structured, not collapsed or noise) | high |
+| P106 | Additive Emergence Index (the composite) | high |
+
+## Family L — Literature-informed evaluations  (`L_*.md`)
+
+| ID | Title | Feasibility |
+|----|-------|-------------|
+| P107 | Simulatability axis (ALMANACS) | medium |
+| P108 | Steerability / read-write check (ActAdd / RepE) | high |
+| P109 | Control-task selectivity as primary decodability statistic (Hewitt & Liang) | high |
+| P110 | Explanation-scoring matcher vs keyword matching (auto-interp scoring) | medium |
+| P111 | Developmental / longitudinal emergence across checkpoints (metric mirage guard) | frontier |
+| P112 | Simulatability-minus-decodability gap (bottleneck utility beyond linear decode) | medium |

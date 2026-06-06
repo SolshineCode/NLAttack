@@ -72,6 +72,15 @@ filters. These additions subtract that confound:
   `identity_leakage_vectors/_text` (is the AR/AV conditioned on input at all?),
   `fit_forced_verbalizer` (read the bottleneck via probes when the AV is empty).
   See `plans/RUDIMENTARY_TIERS.md` for which plans to run first vs shelve.
+- **Emergence dashboard** (`nla_eval/emergence.py`, `experiments/emergence_dashboard.py`)
+  — detect *useful interpretability capability starting to emerge* in a weak/tiny
+  NLA. An **additive Emergence Index** sums orthogonal, null-gated axes
+  (decodability, sufficiency, selectivity, content-adjacency, faithful-rank,
+  stability, dose-response, graded encoding, abstraction transfer, effective rank),
+  gated on decodability clearing the permutation floor so a high score can't come
+  from overfit/degeneracy. Sweep checkpoints for the emergence curve. Plans P101–P106
+  (Family K). Verified: in-dist index ≈0.60 ("established"), cross-domain ≈0.49
+  ("early", driven by near-zero abstraction transfer).
 - **Matcher ensemble** (`EnsembleMatcher`) — vote across topologies
   (lexical/fuzzy/overlap [+embedding/wordnet]); only >threshold agreement counts.
   `ConceptRow.agreement` + `contested_rate()` expose matcher-dependent (suspect)

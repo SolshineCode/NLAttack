@@ -1,0 +1,11 @@
+name,available,raw,null,margin,score
+decodability,True,0.9934278241431107,0.5,0.42639974983258166,1.0
+sufficiency,True,-0.004913202126448468,0.0,-0.004913202126448468,0.31695599291183846
+selectivity,True,0.1794550515366911,0.0,0.1794550515366911,0.5127287186762604
+content_adjacency,False,nan,nan,nan,nan
+faithful_rank,False,nan,nan,nan,nan
+stability,True,0.8801752936271654,0.023766939080153666,0.8564083545470117,0.877258093331536
+dose_response,True,-1.0,0.0,-1.0,0.0
+graded_encoding,False,nan,nan,nan,nan
+abstraction,False,nan,nan,nan,nan
+effective_rank,True,2.6517341522760405,4.0,1.3482658477239595,0.8988438988496918
