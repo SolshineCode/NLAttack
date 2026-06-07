@@ -1,0 +1,84 @@
+{
+  "tier": -1,
+  "tier_label": "INSUFFICIENT CONCEPT COVERAGE \u2014 no verdict",
+  "profile": NaN,
+  "profile_ci": null,
+  "n_concepts": 6,
+  "reasons": [
+    "only 6 concepts (<8); every axis is statistically unreliable \u2014 use semantic labels to raise concept count"
+  ],
+  "axes": [
+    {
+      "name": "decoding_quality",
+      "available": true,
+      "raw": 0.676366714165927,
+      "null": 0.8570802834019063,
+      "margin": -0.18071356923597937,
+      "score": 0.0,
+      "role": "axis"
+    },
+    {
+      "name": "stability",
+      "available": true,
+      "raw": 0.6112093759639857,
+      "null": 0.023839142954224495,
+      "margin": 0.5873702330097612,
+      "score": 0.6017145925986488,
+      "role": "axis"
+    },
+    {
+      "name": "abstraction",
+      "available": false,
+      "raw": NaN,
+      "null": NaN,
+      "margin": NaN,
+      "score": NaN,
+      "role": "axis"
+    },
+    {
+      "name": "content_adjacency",
+      "available": false,
+      "raw": NaN,
+      "null": NaN,
+      "margin": NaN,
+      "score": NaN,
+      "role": "axis"
+    },
+    {
+      "name": "faithful_rank",
+      "available": false,
+      "raw": NaN,
+      "null": NaN,
+      "margin": NaN,
+      "score": NaN,
+      "role": "axis"
+    },
+    {
+      "name": "dose_response",
+      "available": true,
+      "raw": -0.7714285714285715,
+      "null": 0.0,
+      "margin": -0.7714285714285715,
+      "score": 0.11428571428571427,
+      "role": "axis"
+    },
+    {
+      "name": "graded_encoding",
+      "available": false,
+      "raw": NaN,
+      "null": NaN,
+      "margin": NaN,
+      "score": NaN,
+      "role": "axis"
+    },
+    {
+      "name": "effective_rank",
+      "available": true,
+      "raw": 5.988534416378302,
+      "null": 6.0,
+      "margin": 0.011465583621697917,
+      "score": 0.004586233847762022,
+      "role": "axis"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+[rl.parquet  concepts=['report', 'team', 'people', 'government', 'war', 'city', 'game']]
+
+axis               role       avail     raw  margin  score
+decoding_quality   axis       True    0.741  -0.212  0.000
+stability          axis       True    0.697   0.662  0.686
+abstraction        axis       False     nan     nan    nan
+content_adjacency  axis       False     nan     nan    nan
+faithful_rank      axis       False     nan     nan    nan
+dose_response      axis       True    0.107   0.107  0.554
+graded_encoding    axis       False     nan     nan    nan
+effective_rank     axis       True    6.831   0.169  0.056
+
+VERDICT: Tier -1 — INSUFFICIENT CONCEPT COVERAGE — no verdict  (n_concepts=7)
+diagnostic profile score = nan  (secondary; the TIER is the verdict)
+why: only 7 concepts (<8); every axis is statistically unreliable — use semantic labels to raise concept count
+
+wrote C:\Users\caleb\nla-eval-harness\results\emergence\emergence_rl_v01_rl.csv / .json
