@@ -103,3 +103,37 @@ filters. These additions subtract that confound:
 - **Differential, not absolute:** read every number against the dropout law (t01)
   and the frequency-matched control (t03), never alone.
 ```
+
+## Result attribution — name results by the NLA, NOT the base model
+
+**A base model can host many different NLAs** — different AV/AR checkpoints,
+different layers, different training runs/maturity. `gemma-3-27b-it` is a *model*;
+`kitft/nla-gemma3-27b-av @ layer 41` is an *NLA*. Two NLAs on the same base model
+can score completely differently. So **every result in this suite is attributed
+to the NLA, not the base model.**
+
+**Canonical NLA id** (record this with every result):
+
+```
+<av_checkpoint>__<base_model>__L<layer>__<source_id>
+# hosted example:  kitft/nla-gemma3-27b-av__gemma-3-27b-it__L41__kitft-l41
+# local example:   av_v0_1_aux_readout__google/gemma-4-E2B__L23
+```
+
+**Short chart label** (for plots/tables): `<av_basename>@L<layer>` —
+e.g. `nla-gemma3-27b-av@L41`, `Llama-3.3-70B-NLA-av@L53`.
+
+When you publish results, record alongside the number: **NLA id, base model,
+layer, AV + AR checkpoints, the eval suite + dataset used, the matcher backend,
+and the date** (the hosted NLA inference can change under a fixed source id). The
+helpers in `experiments/cross_nla_eval.py` (`nla_name()`) and the discovery call
+`GET /api/nla/sources` produce these fields automatically.
+
+### Cross-NLA results (`results/cross_nla/`)
+`experiments/cross_nla_eval.py` runs the **API-compatible** evals
+(concept-survival retention, substitution/laundering, obfuscation see-through, and
+AV activation-space faithfulness `cosine_similarity`/`mse`) over a fixed dataset
+for every NLA hosted on Neuronpedia — **no local GPU** — and
+`experiments/plot_cross_nla.py` renders the side-by-side comparison. Note: the
+**bottleneck-probe / emergence dashboard is NOT in the cross-NLA set** — it needs
+raw activation vectors the hosted API does not expose (run it locally per NLA).
