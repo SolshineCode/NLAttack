@@ -260,6 +260,20 @@ def axis_effective_rank(X, texts, concepts, seed=0) -> AxisResult:
 
 # ===================== hierarchical tier verdict =====================
 
+# Which axes read the FROZEN base activation (≈constant across AV-LoRA checkpoints,
+# so they DON'T track AV training) vs the few that read the verbalizer. Per
+# collaborator feedback (2026-06-08): to track AV conditioning/training use the
+# verbalizer-side axes in nla_eval/verbalizer_axes.py (minimal_pair_discrimination,
+# doc_retrieval) — the activation-side axes below are ~flat across AV checkpoints.
+AXIS_SIDE = {
+    "decoding_quality": "activation", "stability": "activation",
+    "effective_rank": "activation", "dose_response": "activation",
+    "abstraction": "activation", "graded_encoding": "activation",
+    "content_adjacency": "activation",  # NOTE: this is activation-space distance;
+    "faithful_rank": "activation",      # the VERBALIZER minimal-pair axis lives in
+}                                        # verbalizer_axes.minimal_pair_discrimination
+
+
 @dataclass
 class CapabilityReport:
     axes: List[AxisResult]
@@ -268,6 +282,7 @@ class CapabilityReport:
     n_concepts: int
     profile: float               # SECONDARY diagnostic mean (NOT the verdict)
     profile_ci: Optional[tuple] = None
+    low_confidence: bool = False  # n < min_concepts but run was allowed anyway
     reasons: List[str] = field(default_factory=list)
 
     def get(self, name):
@@ -304,14 +319,22 @@ def _pos(ax: Optional[AxisResult], thr=0.0):
     return ax.margin > thr
 
 
-def capability_tier(axes: List[AxisResult], n_concepts: int, min_concepts: int = 8) -> CapabilityReport:
+def capability_tier(axes: List[AxisResult], n_concepts: int, min_concepts: int = 8,
+                    allow_low_coverage: bool = False) -> CapabilityReport:
     by = {a.name: a for a in axes}
     reasons = []
-    if n_concepts < min_concepts:
+    low_conf = n_concepts < min_concepts
+    if low_conf and not allow_low_coverage:
         return CapabilityReport(axes, -1, TIER_LABELS[-1], n_concepts, float("nan"),
+                                low_confidence=True,
                                 reasons=[f"only {n_concepts} concepts (<{min_concepts}); "
                                          "every axis is statistically unreliable — use semantic "
-                                         "labels to raise concept count"])
+                                         "labels to raise concept count, or pass "
+                                         "allow_low_coverage=True to run anyway with a LOW-"
+                                         "CONFIDENCE flag + wide bootstrap CI"])
+    if low_conf:
+        reasons.append(f"LOW CONFIDENCE: only {n_concepts} concepts (<{min_concepts}); "
+                       "tiers/profile are indicative only — trust the bootstrap CI width.")
     dq = by.get("decoding_quality"); stab = by.get("stability"); ab = by.get("abstraction")
     suf = sel = None
     if dq and dq.available:
@@ -347,13 +370,16 @@ def capability_tier(axes: List[AxisResult], n_concepts: int, min_concepts: int =
                                      "effective_rank")]
     scores = [a.score for a in prof_axes if a and a.available and a.score == a.score]
     profile = float(np.mean(scores)) if scores else float("nan")
-    return CapabilityReport(axes, tier, TIER_LABELS[tier], n_concepts, profile, reasons=reasons)
+    return CapabilityReport(axes, tier, TIER_LABELS[tier], n_concepts, profile,
+                            low_confidence=low_conf, reasons=reasons)
 
 
 def run_capability(X, texts, concepts, *, pairs=None, recon=None, true_dirs=None,
                    decoy_dirs=None, prevalence=None, graded_values=None, group_ids=None,
-                   min_concepts=8, seed=0) -> CapabilityReport:
-    """Snapshot capability verdict (hierarchical tier) for one activation set."""
+                   min_concepts=8, allow_low_coverage=False, seed=0) -> CapabilityReport:
+    """Snapshot capability verdict (hierarchical tier) for one activation set.
+    NOTE: all axes here are ACTIVATION-side (see AXIS_SIDE) — ~constant across
+    AV-LoRA checkpoints. To track AV TRAINING, use nla_eval.verbalizer_axes."""
     dq = axis_decoding_quality(X, texts, concepts, seed=seed)
     # diagnostics surfaced separately (not summed): pure decodability for reference
     axes = [
@@ -367,7 +393,8 @@ def run_capability(X, texts, concepts, *, pairs=None, recon=None, true_dirs=None
         axis_effective_rank(X, texts, concepts, seed=seed),
     ]
     n_concepts = dq.detail.get("n_concepts", 0) if dq.available else 0
-    return capability_tier(axes, n_concepts, min_concepts=min_concepts)
+    return capability_tier(axes, n_concepts, min_concepts=min_concepts,
+                           allow_low_coverage=allow_low_coverage)
 
 
 def bootstrap_profile(X, texts, concepts, n_boot=20, min_concepts=8, seed=0):
