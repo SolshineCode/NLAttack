@@ -1,11 +1,12 @@
-# NLA Evaluation Plans — Master Index (P001–P112)
+# NLA Evaluation Plans — Master Index (P001–P118)
 
-112 plans across 12 families. Schema + themes: see `README.md`. Feasibility: high / medium / frontier.
+118 plans across 13 families. Schema/themes: `README.md`. Feasibility: high/medium/frontier.
 
-**Feasibility mix:** high=40 · medium=56 · frontier=15 · mixed=1 (P037)
+**Feasibility mix:** high=44 · medium=58 · frontier=15 · mixed=1
 
-> Small/weak NLA? see `RUDIMENTARY_TIERS.md`. Emergence detection: Family K + `nla_eval/emergence.py`.
-> Literature basis: `../docs/LITERATURE.md`; integration + new plans (Family L): `../docs/LITERATURE_INTEGRATION.md`.
+> Small/weak NLA? `RUDIMENTARY_TIERS.md`. Emergence: Family K + `nla_eval/emergence.py`.
+> AV-conditioning (track training): `nla_eval/verbalizer_axes.py` + `docs/AV_CONDITIONING_AXES.md`.
+> Deception/misalignment monitoring: Family M + `nla_eval/deception.py`.
 
 
 ## Family A — Concept-survival & dropout-map  (`A_*.md`)
@@ -179,3 +180,14 @@
 | P110 | Explanation-scoring matcher vs keyword matching (auto-interp scoring) | medium |
 | P111 | Developmental / longitudinal emergence across checkpoints (metric mirage guard) | frontier |
 | P112 | Simulatability-minus-decodability gap (bottleneck utility beyond linear decode) | medium |
+
+## Family M — Deception / misalignment monitoring  (`M_*.md`)
+
+| ID | Title | Feasibility |
+|----|-------|-------------|
+| P113 | Bottleneck deception decodability | high |
+| P114 | Verbalizer deception discrimination (the NLA-as-monitor metric) | medium |
+| P115 | Probe-vs-verbalizer deception gap (the monitor's blind spot) | medium |
+| P116 | Cross-scenario deception transfer | high |
+| P117 | Specificity / adversarial control (is it deception, or noise?) | high |
+| P118 | Same-prompt behavioral-split integrity gate | high |
