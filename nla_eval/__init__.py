@@ -8,11 +8,11 @@ from .adapters import NLA, MockNLA, CallableNLA, NeuronpediaNLA, KitftNLA
 from .matching import Matcher, EnsembleMatcher
 from .core import Example, run, RunResult
 from . import (tests, controls, bottleneck_probe, redteam, rudimentary, emergence,
-               verbalizer_axes, confabulation)
+               verbalizer_axes, confabulation, deception)
 
 __all__ = [
     "NLA", "MockNLA", "CallableNLA", "NeuronpediaNLA", "KitftNLA",
     "Matcher", "EnsembleMatcher", "Example", "run", "RunResult",
     "tests", "controls", "bottleneck_probe", "redteam", "rudimentary", "emergence",
-    "verbalizer_axes", "confabulation",
+    "verbalizer_axes", "confabulation", "deception",
 ]

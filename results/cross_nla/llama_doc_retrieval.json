@@ -1,0 +1,14 @@
+{
+  "nla": "kitft/Llama-3.3-70B-NLA-av__llama3.3-70b-it__L53__kitft-l53",
+  "n_docs": 40,
+  "k_distractors": 12,
+  "chance": 0.07692307692307693,
+  "char_top1": 0.395625,
+  "semantic_top1": 0.503,
+  "gemma4_e2b_v01_reference": {
+    "char/tfidf": 0.135,
+    "semantic": 0.135,
+    "chance": 0.077,
+    "p": 0.08
+  }
+}

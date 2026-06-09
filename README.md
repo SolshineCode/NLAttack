@@ -104,6 +104,21 @@ filters. These additions subtract that confound:
   and the frequency-matched control (t03), never alone.
 ```
 
+## Deception / misalignment monitoring (`nla_eval/deception.py`, Family M)
+
+Can an NLA be used to *catch* deceptive/misaligned behavior? Adapted from the SAE
+deception-detection methodology in `deception-nanochat-sae-research` (same-prompt
+behavioral split, multi-judge honest-vs-deceptive labels), wired into the existing
+axes: **bottleneck** (`deception_probe` — is honest-vs-deceptive decodable from the
+activation, with a label-permutation null = their specificity-gap control),
+**verbalizer** (`deception_discrimination` — does the AV text distinguish deceptive
+from honest, the NLA-as-monitor metric), **cross-scenario transfer**, and the
+probe-vs-verbalizer **gap** (deception the AV drops). Integrity gate: labels must be
+the model's own behavior under an *identical* prompt (judge-labeled), never
+instructed deception or role-play. Validated on real data: reproduces the source
+repo's ~0.87 balanced-accuracy baseline (nanochat-d32 L12, AUROC 0.932) through
+NLAttack's own permutation-controlled probe. See `experiments/deception_probe_demo.py`.
+
 ## Result attribution — name results by the NLA, NOT the base model
 
 **A base model can host many different NLAs** — different AV/AR checkpoints,
