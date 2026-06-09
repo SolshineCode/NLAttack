@@ -109,7 +109,17 @@ class MyNLA(NLA):
 Evaluate a hosted NLA on Neuronpedia (no API key, rate limited to 120 req/hr/IP):
 
 ```python
-from nla_eval import NeuronpediaNLA, EnsembleMatcher, run
+from nla_eval import NeuronpediaNLA, EnsembleMatcher, Example, run
+
+# A dataset is a list of Example(id, text, concepts) — `concepts` are the
+# controlled concepts present in `text` that we check survived the bottleneck.
+my_dataset = [
+    Example(id="ex1", text="The committee published its annual budget report",
+            concepts=["budget", "report"]),
+    Example(id="ex2", text="A storm warning was issued for the coastal region",
+            concepts=["storm", "warning"]),
+]
+
 nla = NeuronpediaNLA(model_id="llama3.3-70b-it", nla_source_id="kitft-l53")
 result = run(nla, my_dataset, matcher=EnsembleMatcher())
 ```
