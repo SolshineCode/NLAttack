@@ -1,14 +1,100 @@
-# nla-eval-harness
+# NLAttack
 
-Capability-floor evaluation harness for **Natural Language Autoencoders** (Neuronpedia-hosted NLAs, Gemma E2B autoencoders, or anything that ships next).
+**An evaluation suite for Natural Language Autoencoders (NLAs).**
 
-Built on the premise that current NLAs can't represent negation, order, attribution, or epistemic state — so the **only** reliable measurement is the floor primitive:
+NLAttack measures how faithfully a Natural Language Autoencoder turns a model's
+internal activations into human-readable text, and how well that text can be used
+to monitor model behavior, including deceptive or misaligned behavior. It ships a
+Python harness, a catalog of 118 evaluation plans across 13 families, ready-made
+adapters for hosted and local NLAs, and result artifacts.
 
-> **Did concept C (or a near-neighbor) survive the bottleneck? yes/no**
+The design goal is to work even on weak, small, or early-training NLAs (where most
+metrics saturate or collapse) and to keep every claim honest with explicit null
+controls. This README is self-contained: it defines the terms, explains the
+methodology, and tells you how to run, extend, and cite the suite.
 
-An NLA is treated as a **lossy concept filter**. The harness characterizes that filter, and all 20 tests are just different `group-by`s over one per-concept retention table.
+- Repository: https://github.com/SolshineCode/NLAttack
+- Status: research software, actively developed. APIs may change.
+- License: not yet specified (see [License](#license)).
 
-## Plug in any NLA (one method)
+---
+
+## What is a Natural Language Autoencoder?
+
+A **Natural Language Autoencoder (NLA)** is an interpretability method that
+explains a model's internal state in plain language. It has two trained parts:
+
+```
+activation  --[ AV: activation verbalizer ]-->  natural-language text
+text        --[ AR: activation reconstructor ]-->  activation'
+```
+
+The **AV** reads a hidden activation and writes a description of what it
+represents. The **AR** reads that description and reconstructs the activation.
+Training optimizes the round trip: a good description lets the AR reconstruct the
+original activation closely (measured in activation space, e.g. cosine
+similarity). The human-readable **bottleneck** is the AV's text. The promise of
+NLAs over sparse autoencoders or linear probes is that the explanation is in
+natural language, so a person can read it and even edit it to intervene.
+
+NLAs are introduced in Anthropic's "Natural Language Autoencoders" work
+(https://www.anthropic.com/research/natural-language-autoencoders,
+https://transformer-circuits.pub/2026/nla/). Interactive NLAs for several open
+models are hosted on Neuronpedia (https://www.neuronpedia.org/nla), and an
+open-source training library is `kitft/natural_language_autoencoders`.
+
+## What NLAttack measures, and why
+
+An NLA can fail on two distinct sides, and NLAttack scores both:
+
+1. **Bottleneck side (the activation).** Does the activation even carry the
+   concept? Measured with linear **probes on the activation**, each with a
+   label-permutation null control.
+2. **Verbalizer side (the AV text).** Does the AV's description actually surface
+   the concept that the bottleneck holds? Measured by matching concepts in the
+   verbalization, and by discrimination, retrieval, and faithfulness axes.
+
+The gap between the two (`probe accuracy − verbalizer accuracy`) isolates how much
+the verbalizer loses, which is usually the part a practitioner is stuck on.
+
+Two principles run through the suite:
+
+- **Floor-first.** On a weak NLA the verbalizer can be degenerate and the AR
+  near-random, so end-to-end metrics collapse to noise. The base measurement is a
+  single reliable primitive: *did concept C (or a near neighbor) survive into the
+  verbalization, yes or no?* Everything aggregates from one per-concept table.
+- **Null controls on everything.** A probe at small n can hit high accuracy on
+  pure noise. Every probe reports a label-permutation floor, and a result counts
+  as signal only when it clears that floor by a margin. Matcher-dependent effects
+  are flagged by an ensemble-agreement check.
+
+## Installation
+
+```bash
+git clone https://github.com/SolshineCode/NLAttack.git
+cd NLAttack
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+The core harness has **no required dependencies** (the lexical matcher and the
+mock NLA run on the standard library). The extras in `requirements.txt` unlock
+stronger components:
+
+- `sentence-transformers`, `nltk` for the strongest concept-matching backends and
+  semantic retrieval,
+- `scikit-learn`, `numpy`, `scipy` for the probe / emergence / deception axes,
+- `torch`, `transformers`, `safetensors` only for running a **local** NLA.
+
+## Quickstart
+
+Run the offline smoke test (a deliberately lossy mock NLA, no network or GPU):
+
+```bash
+python run_example.py
+```
+
+Plug in any NLA by implementing one method:
 
 ```python
 from nla_eval import NLA
@@ -16,139 +102,230 @@ from nla_eval import NLA
 class MyNLA(NLA):
     name = "my-nla"
     def reconstruct(self, text: str) -> str:
-        return my_model(text)        # encode->bottleneck->decode
-    # optional: encode(text)->vector  (only the latent-probe tests use it)
+        return my_verbalizer(text)          # text -> activation -> AV description
+    # optional: encode(text) -> activation vector  (used by the probe axes)
 ```
 
-**A real NLA is `activation → verbalizer (AV) → text → reconstructor (AR) → activation`** — not text→text. The human-readable bottleneck is the AV's description, so the harness measures concept survival as `input text → host activation @ layer L → AV verbalization`, then asks whether concept C survived. That's the "monitor reads the NL bottleneck" framing.
+Evaluate a hosted NLA on Neuronpedia (no API key, rate limited to 120 req/hr/IP):
 
-Ready-made adapters in `adapters.py`:
-- `MockNLA` — deps-free lossy filter, for testing the harness itself.
-- `NeuronpediaNLA` — **verified live** against `POST /api/nla/explain` (no API key needed; 120 req/hr/IP). Sources via `GET /api/nla/sources`: `gemma-3-27b-it`/`kitft-l41` (Gemma) and `llama3.3-70b-it`/`kitft-l53`. The bottleneck text = concatenated per-position AV `description`s. Run `python test_neuronpedia_live.py`.
-- `KitftNLA` — local AV/AR checkpoints from `kitft/natural_language_autoencoders` (`kitft/nla-{base}-L{layer}-av`). Grabs the host-model activation, then verbalizes.
-- `CallableNLA` — wrap any `fn(str)->str`.
-
-See `real_nla_example.py` for both wiring paths.
-
-## Run
-
-```bash
-python run_example.py          # mock NLA + attack dataset, prints all readouts
+```python
+from nla_eval import NeuronpediaNLA, EnsembleMatcher, run
+nla = NeuronpediaNLA(model_id="llama3.3-70b-it", nla_source_id="kitft-l53")
+result = run(nla, my_dataset, matcher=EnsembleMatcher())
 ```
 
-`Matcher(backend="auto")` self-selects the strongest concept-presence backend
-installed: **embedding** (sentence-transformers) > **wordnet** (nltk) > **lexical**
-(always works, zero deps). Force one with `backend=...` for reproducibility.
+Discover the hosted NLAs with `GET https://www.neuronpedia.org/api/nla/sources`.
+At time of writing two are hosted: `gemma-3-27b-it`/`kitft-l41` and
+`llama3.3-70b-it`/`kitft-l53`. The hosted inference backend can be intermittent
+(the Gemma-3 endpoint was returning 502 at time of writing); the suite retries
+gateway errors and records per-NLA failures rather than crashing.
 
-## The 20 tests
+## The evaluation suite
 
-Each is a `group-by` over the retention table; tags come from `Example.meta`.
+The suite has two layers: a **plan catalog** (the design space) and an
+**implemented harness** (runnable code).
 
-**General adjacency (1–10)** — `tests.t01..t09`
-1 dropout law · 2 adjacency substitution · 3 category-selective dropout · 4 specificity collapse · 5 salience crowding* · 6 paired-neighbor asymmetry* · 7 co-occurrence hallucination · 8 quantity flattening* · 9 blind-spot stability · 10 floor calibration control*
+### Plan catalog: 118 plans, 13 families
 
-**ATT&CK misuse (11–20)** — grounded in the LLM ATT&CK Navigator post — `tests.t11..t20`
-11 technique coverage · 12 obfuscation see-through (central) · 13 attack→benign laundering · 14 risk-weighted dropout · 15 evasion robustness · 16 kill-chain co-occurrence · 17 agentic-scaffolding markers* · 18 ARiES axis separability · 19 dual-use disambiguation* · 20 severity monotonicity
+Each plan is a falsifiable evaluation with a fixed schema (hypothesis, method,
+metric, feasibility, controls, and a "null looks like" line). The full table is in
+[`plans/INDEX.md`](plans/INDEX.md); the schema is in [`plans/README.md`](plans/README.md).
 
-`*` = scaffolded via the same retention table + meta tags; add the tagged dataset to activate. The starred ones are the frontier/expected-null tests — run them, don't lean on them.
+| Family | Plans | Theme |
+|---|---|---|
+| A | P001–P010 | Concept survival and the dropout map (the floor primitive) |
+| B | P011–P020 | Content adjacency and laundering (neighbor substitution, hypernym drift) |
+| C | P021–P030 | Deception and knowledge asymmetry (epistemic-state preservation) |
+| D | P031–P040 | ATT&CK / misuse detection (does the bottleneck preserve attack content) |
+| E | P041–P050 | Bottleneck probes / ground truth (probe-vs-verbalizer gap) |
+| F | P051–P060 | Matcher and verbalizer confound (isolating measurement error) |
+| G | P061–P070 | Adaptive red team (compositional blind spots, query-budget evasion) |
+| H | P071–P080 | Faithfulness / AR fidelity (activation-space reconstruction) |
+| I | P081–P090 | Distributional / OOD / training dependence |
+| J | P091–P100 | Calibration / uncertainty / self-knowledge |
+| K | P101–P106 | Emergence and the additive capability index |
+| L | P107–P112 | Literature-informed evaluations (simulatability, steerability, etc.) |
+| M | P113–P118 | Deception / misalignment monitoring |
 
-## Validity layer (from the Hermes design review — see `DESIGN_REVIEW.md`)
+For evaluating weak or tiny NLAs, [`plans/RUDIMENTARY_TIERS.md`](plans/RUDIMENTARY_TIERS.md)
+sorts the plans into run-first, floor-version, and skip-until-stronger tiers.
 
-A skeptical review (Hermes `nemotron-3-ultra`) flagged that the raw retention
-signal is confounded: the AV verbalizer and the matcher are two extra lossy
-filters. These additions subtract that confound:
+### Implemented harness (`nla_eval/`)
 
-- **Bottleneck probes** (`nla_eval/bottleneck_probe.py`) — the deepest fix.
-  Train a linear probe on the NLA's activation (the true bottleneck) for ground-
-  truth concept presence, independent of verbalizer/matcher. `probe_acc −
-  av_matcher_acc = verbalizer+matcher loss`. Demonstrated on a local Gemma-4-E2B
-  NLA: in-distribution concepts probe at ~0.99 AUC, OOD at ~0.70 — the bottleneck
-  is *not* a uniform filter. See `results/local_gemma_e2b/`. Each probe carries a
-  **label-permutation null control** (`ProbeResult.signal`) so a high AUC at small
-  n can't be mistaken for overfit noise.
-- **Rudimentary-NLA floor tooling** (`nla_eval/rudimentary.py`) — for evaluating
-  *weaker/tinier* NLAs (degenerate AV, near-random AR), where end-to-end metrics
-  collapse. `bottleneck_exists` (does any signal clear the noise floor?),
-  `identity_leakage_vectors/_text` (is the AR/AV conditioned on input at all?),
-  `fit_forced_verbalizer` (read the bottleneck via probes when the AV is empty).
-  See `plans/RUDIMENTARY_TIERS.md` for which plans to run first vs shelve.
-- **Emergence dashboard** (`nla_eval/emergence.py`, `experiments/emergence_dashboard.py`)
-  — detect *useful interpretability capability starting to emerge* in a weak/tiny
-  NLA. An **additive Emergence Index** sums orthogonal, null-gated axes
-  (decodability, sufficiency, selectivity, content-adjacency, faithful-rank,
-  stability, dose-response, graded encoding, abstraction transfer, effective rank),
-  gated on decodability clearing the permutation floor so a high score can't come
-  from overfit/degeneracy. Sweep checkpoints for the emergence curve. Plans P101–P106
-  (Family K). Verified: in-dist index ≈0.60 ("established"), cross-domain ≈0.49
-  ("early", driven by near-zero abstraction transfer).
-- **Matcher ensemble** (`EnsembleMatcher`) — vote across topologies
-  (lexical/fuzzy/overlap [+embedding/wordnet]); only >threshold agreement counts.
-  `ConceptRow.agreement` + `contested_rate()` expose matcher-dependent (suspect)
-  effects.
-- **Faithfulness weighting** (`faithfulness_weighted_retention`) — down-weight
-  "survived" concepts whose activation was reconstructed poorly, using the
-  `cosine_similarity`/`mse` the Neuronpedia API already returns.
-- **Frequency+length matched controls** (`nla_eval/controls.py`) — for every test.
-- **Adaptive red-team** (`nla_eval/redteam.py`) — compositional blind spots +
-  query-budgeted evasion search; static i.i.d. tests miss adaptive attackers.
-- **Local NLA adapter** (`nla_eval/local_gemma_e2b.py`) — activation→AV
-  verbalization for a local Gemma-4-E2B NLA (full activation access for probes).
+| Module | What it does |
+|---|---|
+| `core.py` | the per-concept retention table and `run()` |
+| `adapters.py` | the `NLA` contract plus `MockNLA`, `NeuronpediaNLA`, `KitftNLA`, `CallableNLA` |
+| `matching.py` | `Matcher` and `EnsembleMatcher` (lexical/fuzzy/overlap, plus embedding/wordnet when installed) with a continuous `soft_score` |
+| `tests.py` | 20 coded retention tests (general adjacency + ATT&CK misuse) as group-bys |
+| `bottleneck_probe.py` | linear probes on the activation with a permutation null |
+| `emergence.py` | hierarchical-tier capability verdict and the longitudinal emergence criterion |
+| `verbalizer_axes.py` | AV-conditioning axes that move with AV training: minimal-pair discrimination (AUC), held-out doc retrieval, prior deviation, mode collapse, calibration |
+| `deception.py` | deception / misalignment monitoring (probe, discrimination, cross-scenario transfer) |
+| `confabulation.py` | factual grounding, thematic fidelity, consistency |
+| `rudimentary.py` | floor checks (does a bottleneck exist, and is the AR/AV input-conditioned) |
+| `controls.py` | frequency-and-length-matched controls |
+| `redteam.py` | adaptive evasion and compositional blind-spot search |
+| `attack_concepts.py` | ATT&CK technique dictionary for the misuse family |
+| `local_gemma_e2b.py` | adapter for a local Gemma-E2B NLA (full activation access) |
 
-## Honest limits
+Worked examples are in `experiments/` (`cross_nla_eval.py`, `plot_cross_nla.py`,
+`emergence_dashboard.py`, `deception_probe_demo.py`, and others).
 
-- **Concept matching is the weak link.** Embedding backend recommended; always
-  human-spot-check `matched_term` in `retention_table.csv`.
-- **Floor confound:** a low score can mean "NLA dropped it" *or* "decoder couldn't
-  phrase it." Test 10 (below-floor control) calibrates where you've run out of signal.
-- **Differential, not absolute:** read every number against the dropout law (t01)
-  and the frequency-matched control (t03), never alone.
-```
+## Activation-side vs verbalizer-side axes
 
-## Deception / misalignment monitoring (`nla_eval/deception.py`, Family M)
+A practical distinction the suite makes explicit. **Activation-side** axes
+(decodability, selectivity, stability, effective rank) read the frozen base
+activation, so they are roughly constant across AV checkpoints and do **not**
+track AV training. **Verbalizer-side** axes (in `verbalizer_axes.py`) run the AV,
+so they move as it is trained. To track AV conditioning across training
+checkpoints, use the verbalizer-side axes. See
+[`docs/AV_CONDITIONING_AXES.md`](docs/AV_CONDITIONING_AXES.md).
 
-Can an NLA be used to *catch* deceptive/misaligned behavior? Adapted from the SAE
-deception-detection methodology in `deception-nanochat-sae-research` (same-prompt
-behavioral split, multi-judge honest-vs-deceptive labels), wired into the existing
-axes: **bottleneck** (`deception_probe` — is honest-vs-deceptive decodable from the
-activation, with a label-permutation null = their specificity-gap control),
-**verbalizer** (`deception_discrimination` — does the AV text distinguish deceptive
-from honest, the NLA-as-monitor metric), **cross-scenario transfer**, and the
-probe-vs-verbalizer **gap** (deception the AV drops). Integrity gate: labels must be
-the model's own behavior under an *identical* prompt (judge-labeled), never
-instructed deception or role-play. Validated on real data: reproduces the source
-repo's ~0.87 balanced-accuracy baseline (nanochat-d32 L12, AUROC 0.932) through
-NLAttack's own permutation-controlled probe. See `experiments/deception_probe_demo.py`.
+## Deception / misalignment monitoring (Family M)
 
-## Result attribution — name results by the NLA, NOT the base model
+The deception family asks: can this NLA be used to *catch* deceptive or misaligned
+behavior? It adapts the methodology of prior SAE-based deception-detection work,
+where honest and deceptive activations are collected under an **identical prompt**
+(the behavior is the model's own choice, not an instruction) and labeled by a
+multi-judge consortium. NLAttack wires that substrate into its existing axes:
 
-**A base model can host many different NLAs** — different AV/AR checkpoints,
-different layers, different training runs/maturity. `gemma-3-27b-it` is a *model*;
-`kitft/nla-gemma3-27b-av @ layer 41` is an *NLA*. Two NLAs on the same base model
-can score completely differently. So **every result in this suite is attributed
-to the NLA, not the base model.**
+- `deception_probe`: is honest-vs-deceptive linearly decodable from the
+  bottleneck? (with the label-permutation null as the specificity control)
+- `deception_discrimination`: does the AV text distinguish deceptive from honest
+  on the same prompt? (the NLA-as-monitor metric)
+- `cross_scenario_transfer`: does detection generalize across scenario domains?
 
-**Canonical NLA id** (record this with every result):
+**Integrity gate (non-negotiable):** labels must come from the model's own
+behavior under an identical prompt. Instructed deception or role-assignment turns
+the task into prompt classification, so any such run is a control, not a primary
+result. This is enforced in the family's documentation and result metadata.
+
+## Reproducible findings to date
+
+These come with the suite (`results/`) and are stated with their caveats.
+
+- **Cross-NLA, hosted (no GPU).** On a fixed dataset, the **Llama-3.3-70B** NLA
+  (`kitft-l53`) reaches concept retention 0.95, zero attack-to-benign laundering,
+  and mean AV faithfulness (cosine) 0.888. Held-out doc retrieval, matched to the
+  Gemma-4 protocol below (same docs, 12 distractors so chance is 0.077, MiniLM
+  embedder): char 0.396, semantic 0.503.
+- **Local Gemma-4-E2B NLA.** The bottleneck encodes in-distribution concepts at
+  about 0.99 probe AUC and out-of-distribution concepts at about 0.70, so the
+  bottleneck is not a uniform filter. The verbalizer is the weak side: held-out
+  doc retrieval is about 0.135 (chance 0.077, not significant), placing it at the
+  conditioning wall. Same metric, the Llama NLA is roughly 3.7x higher.
+- **Deception probe on real behavioral-split data.** On honest-vs-deceptive
+  activations from prior work (nanochat-d32, layer 12, n=1327), the deception
+  probe reaches AUROC 0.932 / balanced accuracy 0.866 versus a shuffled-label
+  floor of 0.49, reproducing that line of work's roughly 0.87 baseline through
+  NLAttack's own permutation-controlled probe.
+
+Numbers from the hosted API can change under a fixed source id (the backend is
+redeployed), which is exactly why results are attributed and dated.
+
+## Result attribution: name results by the NLA, not the base model
+
+A base model can host many different NLAs (different AV/AR checkpoints, layers,
+and training runs). `gemma-3-27b-it` is a *model*; `kitft/nla-gemma3-27b-av` at
+layer 41 is an *NLA*, and two NLAs on the same base model can score very
+differently. **Every result in this suite is attributed to the NLA.**
+
+Canonical NLA id (record it with every result):
 
 ```
 <av_checkpoint>__<base_model>__L<layer>__<source_id>
 # hosted example:  kitft/nla-gemma3-27b-av__gemma-3-27b-it__L41__kitft-l41
-# local example:   av_v0_1_aux_readout__google/gemma-4-E2B__L23
+# local example:   av_v0_1__google/gemma-4-E2B__L23
 ```
 
-**Short chart label** (for plots/tables): `<av_basename>@L<layer>` —
-e.g. `nla-gemma3-27b-av@L41`, `Llama-3.3-70B-NLA-av@L53`.
+Short label for plots and tables: `<av_basename>@L<layer>`, e.g.
+`nla-gemma3-27b-av@L41`. When you publish a number, record the NLA id, the base
+model, the layer, the AV and AR checkpoints, the eval suite version (a commit
+hash), the dataset, the matcher backend, and the date. `nla_name()` in
+`experiments/cross_nla_eval.py` builds these fields automatically.
 
-When you publish results, record alongside the number: **NLA id, base model,
-layer, AV + AR checkpoints, the eval suite + dataset used, the matcher backend,
-and the date** (the hosted NLA inference can change under a fixed source id). The
-helpers in `experiments/cross_nla_eval.py` (`nla_name()`) and the discovery call
-`GET /api/nla/sources` produce these fields automatically.
+## Methodology and honest limits
 
-### Cross-NLA results (`results/cross_nla/`)
-`experiments/cross_nla_eval.py` runs the **API-compatible** evals
-(concept-survival retention, substitution/laundering, obfuscation see-through, and
-AV activation-space faithfulness `cosine_similarity`/`mse`) over a fixed dataset
-for every NLA hosted on Neuronpedia — **no local GPU** — and
-`experiments/plot_cross_nla.py` renders the side-by-side comparison. Note: the
-**bottleneck-probe / emergence dashboard is NOT in the cross-NLA set** — it needs
-raw activation vectors the hosted API does not expose (run it locally per NLA).
+- **Concept matching is the weak link.** Prefer the embedding matcher and spot-
+  check matched terms. The ensemble agreement / contested-rate check flags effects
+  that only one matcher topology sees.
+- **A low score is ambiguous** without controls. It can mean the NLA dropped the
+  concept, or the verbalizer could not phrase it, or the matcher missed it. The
+  bottleneck probe (ground truth) and the permutation null are how you tell these
+  apart.
+- **Read differentially.** Compare every number to the frequency-and-length
+  matched control and the noise floor, not in isolation.
+- **Hosted-API subset.** The probe and emergence axes need raw activations, which
+  the hosted API does not expose. Over the API you can run the verbalizer-side and
+  retention evals, and run the probe axes against a local NLA.
+
+The rationale behind these choices, including two external expert reviews, is in
+[`DESIGN_REVIEW.md`](DESIGN_REVIEW.md) and [`docs/`](docs/).
+
+## Repository layout
+
+```
+nla_eval/         the harness (importable package)
+plans/            118 evaluation plans (A–M), INDEX.md, schema, rudimentary tiers
+experiments/      runnable scripts (cross-NLA eval, plots, emergence, deception)
+results/          committed result artifacts (cross_nla/, emergence/, deception/, ...)
+docs/             literature review, AV-conditioning axes, design notes
+DESIGN_REVIEW.md  validity threats and the rationale for the controls
+requirements.txt  optional extras (core needs none)
+```
+
+## How to cite
+
+If you use NLAttack in research, please cite the software. A `CITATION.cff` is
+included so GitHub shows a "Cite this repository" button.
+
+Recommended citation:
+
+> DeLeeuw, C. (2026). *NLAttack: An evaluation suite for Natural Language
+> Autoencoders* [Computer software]. https://github.com/SolshineCode/NLAttack
+
+BibTeX:
+
+```bibtex
+@software{deleeuw_nlattack_2026,
+  author  = {DeLeeuw, Caleb},
+  title   = {{NLAttack}: An Evaluation Suite for Natural Language Autoencoders},
+  year    = {2026},
+  url      = {https://github.com/SolshineCode/NLAttack},
+  note    = {Version 0.1.0}
+}
+```
+
+**Citing a result produced with NLAttack.** A score is meaningful only with the
+NLA it was measured on. Report the canonical NLA id, the suite commit hash, the
+dataset, the matcher backend, and the date alongside the number. For example:
+"retention 0.95 on `kitft/Llama-3.3-70B-NLA-av__llama3.3-70b-it__L53__kitft-l53`,
+NLAttack `@<commit>`, cross_nla dataset, ensemble matcher, 2026-06-08." This lets
+others reproduce and compare against the exact NLA and suite version.
+
+## Acknowledgements and references
+
+- Natural Language Autoencoders: Anthropic
+  (https://www.anthropic.com/research/natural-language-autoencoders;
+  https://transformer-circuits.pub/2026/nla/).
+- Hosted NLAs and the inference API: Neuronpedia (https://www.neuronpedia.org/nla).
+- NLA training library: `kitft/natural_language_autoencoders`.
+- The misuse family is grounded in Anthropic's LLM ATT&CK Navigator
+  (https://red.anthropic.com/2026/attack-navigator/) and the MITRE ATT&CK
+  framework.
+- The methodology draws on the probing-classifier literature (control tasks and
+  selectivity), the SAE interpretability literature, and work on measuring
+  emergence. The full reading list with arXiv ids is in
+  [`docs/LITERATURE.md`](docs/LITERATURE.md).
+
+## License
+
+No license file is present yet, so default copyright applies (all rights reserved)
+until one is added. If you intend to use or redistribute this work, contact the
+author. Adding an OSI-approved license (for example Apache-2.0 or MIT) is
+recommended before wider release.
+
+## Contact
+
+Caleb DeLeeuw (`SolshineCode`), caleb.deleeuw@gmail.com.
