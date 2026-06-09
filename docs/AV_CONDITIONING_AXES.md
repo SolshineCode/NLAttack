@@ -66,3 +66,24 @@ emergence.run_capability(X, texts, concepts, allow_low_coverage=True)
 
 The real fix for coverage is semantic (not keyword) labels (plan P050) to lift the
 concept count past the floor.
+
+## Update 2026-06-08 — hardened after two Hermes reviews
+
+- **`minimal_pair_discrimination` is now AUC-based** (chance = 0.5), with a
+  permutation p-value and a `matcher_ceiling_auc` covariate, instead of the
+  earlier `hit ∧ ¬hit` (which conflated AV conditioning with matcher recall and
+  used a wrong null). Verified to rise 0.50 → 1.00 as a simulated AV conditions.
+- **ATT&CK demo shipped:** `verbalizer_axes.build_attack_pairs(activation_of)`
+  builds attack-term-vs-benign-neighbor pairs from `attack_concepts.py`, so the
+  default discrimination demo *is* the misuse laundering test (can the monitor
+  tell "credential dumping" from "password management"?).
+- **New verbalizer-side axes:** `doc_retrieval` now reports the char-vs-semantic
+  gap (lexical-parroting detector) + copy-doc reference; `prior_deviation`
+  (contrastive: does the activation add signal beyond the prior?); `mode_collapse`
+  (diversity / collapse flag); `calibration_entropy` (self-consistency across
+  temperature samples).
+- **`nla_eval/confabulation.py`** — confabulation rate (specific entity/number
+  claims unsupported by the source), thematic fidelity, cross-sample consistency.
+  The #1 stated NLA limitation and a misuse-monitor trust blocker.
+- Bigger gated items (causal-fidelity north-star, steganography, the auditing
+  game, cross-layer/OOD/efficiency baselines) are in `ROADMAP.md`.

@@ -242,3 +242,11 @@ class EnsembleMatcher:
             matched = matched[0][0] if matched else None
         return EnsembleMatch(concept, present, matched, agreement, "ensemble",
                              agreement, verdicts)
+
+    def soft_score(self, concept: str, output_text: str) -> float:
+        """Continuous [0,1] presence score = mean of each backend's raw similarity
+        (not the binary present/absent). For AUC/d-prime over pos-vs-neg pairs,
+        where a threshold-free, graded signal is needed (avoids conflating AV
+        conditioning with the matcher's binary recall)."""
+        sims = [m.match(concept, output_text).similarity for m in self.matchers.values()]
+        return float(sum(sims) / len(sims)) if sims else 0.0
