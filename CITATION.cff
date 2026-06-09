@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use NLAttack in research, please cite it as below."
+title: "NLAttack: An Evaluation Suite for Natural Language Autoencoders"
+abstract: >-
+  NLAttack is an evaluation suite for Natural Language Autoencoders (NLAs):
+  interpretability methods that verbalize a model's internal activations into
+  human-readable text and reconstruct them. It scores both the bottleneck
+  (activation) and the verbalizer sides with explicit null controls, works on
+  weak or early-training NLAs, and includes a 118-plan catalog across 13
+  families plus deception/misalignment monitoring.
+type: software
+authors:
+  - family-names: DeLeeuw
+    given-names: Caleb
+    alias: SolshineCode
+    email: caleb.deleeuw@gmail.com
+version: "0.1.0"
+url: "https://github.com/SolshineCode/NLAttack"
+repository-code: "https://github.com/SolshineCode/NLAttack"
+keywords:
+  - interpretability
+  - natural language autoencoders
+  - evaluation
+  - benchmark
+  - mechanistic interpretability
+  - deception detection
+  - AI safety
+preferred-citation:
+  type: software
+  title: "NLAttack: An Evaluation Suite for Natural Language Autoencoders"
+  authors:
+    - family-names: DeLeeuw
+      given-names: Caleb
+      alias: SolshineCode
+  year: 2026
+  url: "https://github.com/SolshineCode/NLAttack"
