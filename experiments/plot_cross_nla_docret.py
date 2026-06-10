@@ -24,7 +24,8 @@ OUT = os.path.join(ROOT, "results", "cross_nla", "cross_nla_docret_comparison.pn
 
 
 def main():
-    d = json.load(open(SRC))
+    with open(SRC, "r", encoding="utf-8") as f:
+        d = json.load(f)
     chance = d["chance"]
     gemma4 = d["gemma4_e2b_v01_reference"]
 
@@ -77,6 +78,7 @@ def main():
                  fontsize=12)
     fig.tight_layout(rect=(0, 0, 1, 0.92))
     fig.savefig(OUT, dpi=130)
+    plt.close(fig)
     print("wrote", OUT)
 
 
