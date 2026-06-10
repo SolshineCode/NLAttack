@@ -107,11 +107,12 @@ Two principles run through the suite:
 adversary tactics and techniques (reconnaissance, credential dumping, lateral
 movement, and so on). Anthropic's red team adapted it to language models in the
 **[LLM ATT&CK Navigator](https://red.anthropic.com/2026/attack-navigator/)**, which
-maps how LLM misuse falls across those tactics and scores risk on three ARiES axes:
-Threat, Vulnerability, and Impact. Two findings from that work shape the misuse families directly. Risk is not
-uniform across tactics, so a monitor with holes in the high-risk post-compromise
-tactics is worse than its average hole rate suggests. And agentic orchestration, a
-model chaining steps autonomously, is the single largest risk amplifier.
+maps how LLM misuse falls across those tactics and scores risk on three ARiES
+axes: Threat, Vulnerability, and Impact. Two findings from that work shape the
+misuse families directly. Risk is not uniform across tactics, so a monitor with
+holes in the high-risk post-compromise tactics is worse than its average hole
+rate suggests. And agentic orchestration, a model chaining steps autonomously,
+is the single largest risk amplifier.
 
 NLAttack treats those findings as the test specification for "is this NLA a usable
 misuse monitor." `attack_concepts.py` encodes 18 techniques spanning 13 of the
