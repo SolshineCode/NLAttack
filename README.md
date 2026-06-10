@@ -235,18 +235,66 @@ sorts the plans into run-first, floor-version, and skip-until-stronger tiers.
 | `redteam.py` | adaptive evasion and compositional blind-spot search |
 | `attack_concepts.py` | ATT&CK technique dictionary for the misuse family |
 | `local_gemma_e2b.py` | adapter for a local Gemma-E2B NLA (full activation access) |
+| `access.py` | the access-tier map (API-runnable vs full-access) and leaderboard-metric list |
 
 Worked examples are in `experiments/` (`cross_nla_eval.py`, `plot_cross_nla.py`,
 `emergence_dashboard.py`, `deception_probe_demo.py`, and others).
 
-## Activation-side vs verbalizer-side axes
+## Access tiers: API-runnable vs full-access
 
-A practical distinction the suite makes explicit. **Activation-side** axes
-(decodability, selectivity, stability, effective rank) read the frozen base
-activation, so they are roughly constant across AV checkpoints and do **not**
-track AV training. **Verbalizer-side** axes (in `verbalizer_axes.py`) run the AV,
-so they move as it is trained. To track AV conditioning across training
-checkpoints, use the verbalizer-side axes. See
+For NLAttack to work as a public benchmark, the suite is split by the access a
+given NLA requires, the way SWE-bench or a closed-book exam separate what every
+system can attempt from what only some can. The split is encoded in code at
+[`nla_eval/access.py`](nla_eval/access.py), so you can ask it directly
+(`access.requires_full_access("bottleneck_probe")`).
+
+**Tier 1, API-runnable (the universal leaderboard).** Everything computable from
+what a hosted endpoint returns: the AV's verbalization text, plus a scalar
+reconstruction faithfulness (cosine / mse) if the endpoint provides one. This runs
+on **any** NLA, hosted or local, so every NLA gets a row. Local NLAs are scored
+here too. They simply also unlock Tier 2. This tier covers concept retention,
+content adjacency and laundering, the ATT&CK misuse tests, held-out doc retrieval,
+minimal-pair discrimination, mode collapse, calibration, and the verbalizer side of
+deception monitoring.
+
+**Tier 2, full-access (the white-box extension).** Anything that needs the raw
+activation vector, the model internals, or training checkpoints, which a hosted API
+does not expose. This is where the linear bottleneck probes, the probe-minus-
+verbalizer gap, activation-space faithfulness, the emergence and longitudinal
+capability index, and the probe-grounded misuse and deception plans live. It runs
+only on NLAs you have the weights for.
+
+| Family | Theme | Access tier |
+|---|---|---|
+| A | concept survival / dropout map | API |
+| B | content adjacency / laundering | API |
+| C | deception and knowledge asymmetry | mixed (discrimination API, epistemic probe full) |
+| D | ATT&CK / misuse detection | mixed (survival, see-through, laundering API; P037/P038/P040 full) |
+| E | bottleneck probes / ground truth | full-access |
+| F | matcher and verbalizer confound | API |
+| G | adaptive red team (text-level) | API |
+| H | faithfulness / AR fidelity | mixed (scalar cos/mse API if exposed, activation-space analysis full) |
+| I | distributional / OOD / training dependence | full-access |
+| J | calibration / uncertainty | API |
+| K | emergence and additive capability index | full-access |
+| L | literature-informed axes | mixed (simulatability API; steerability full) |
+| M | deception / misalignment monitoring | mixed (discrimination API; probe and transfer full) |
+
+A second, independent axis matters for the leaderboard: **comparability**. Of the
+API-tier metrics, only the **protocol-anchored** ones (a fixed null regardless of
+model or dataset) are honestly comparable across different NLAs: held-out doc
+retrieval (chance set by the distractor count), minimal-pair and deception
+discrimination AUC (chance 0.5), obfuscation see-through, and laundering rate. These
+are `access.LEADERBOARD_METRICS`. Activation-space scalars like raw cosine are not
+on a common scale across base models, so they are reported per-NLA, not ranked.
+
+This access split lines up with an older distinction the suite still uses for a
+different reason. **Activation-side** axes (decodability, selectivity, stability,
+effective rank) read the frozen base activation, so they are roughly constant across
+AV checkpoints and do not track AV training. They are also the full-access axes.
+**Verbalizer-side** axes (in `verbalizer_axes.py`) run the AV, move as it trains,
+and are the API-tier axes. To track AV conditioning across training checkpoints, use
+the verbalizer-side axes. See
 [`docs/AV_CONDITIONING_AXES.md`](docs/AV_CONDITIONING_AXES.md).
 
 ## Deception / misalignment monitoring (Family M)
@@ -273,19 +321,30 @@ result. This is enforced in the family's documentation and result metadata.
 These come with the suite (`results/`) and are stated with their caveats. Results
 are named by the NLA, not the base model (see the attribution section below).
 
-| NLA (by name) | Base model | Run mode | Concept retention | AV faithfulness (cos) | Doc retrieval, char / semantic | Bottleneck probe AUC |
-|---|---|---|---|---|---|---|
-| `Llama-3.3-70B-NLA-av@L53` | llama3.3-70b-it | Neuronpedia (hosted) | 0.95 | 0.890 | 0.396 / 0.503 | not available (no activation access over the API) |
-| `Gemma-4-E2B-NLA@L23` | google/gemma-4-E2B | local | not run on this set | not run on this set | 0.135 / 0.135 | 0.988 in-dist, 0.695 OOD |
-| `nla-gemma3-27b-av@L41` | gemma-3-27b-it | Neuronpedia (hosted) | pending | pending | pending | not available |
+**API tier (the universal leaderboard, any NLA).** Doc retrieval is the headline
+column because its null is fixed by the protocol (same documents, 12 distractors so
+chance is 0.077, MiniLM embedder), so it is directly comparable across NLAs.
 
-Doc retrieval uses one identical protocol across NLAs (same documents, 12
-distractors so chance is 0.077, MiniLM embedder), which makes it the one number
-directly comparable across the tested NLAs. The Llama NLA also shows zero
-attack-to-benign laundering and 0.83 obfuscation see-through. The Gemma-3 NLA is
-pending because its hosted inference server has returned 502 since about
-2026-06-05, not because of a harness error (an identical request returns 200 for
-Llama).
+| NLA (by name) | Base model | Access | Doc retrieval char / sem | Concept retention | Obfuscation see-through | Laundering |
+|---|---|---|---|---|---|---|
+| `Llama-3.3-70B-NLA-av@L53` | llama3.3-70b-it | hosted (API only) | **0.396 / 0.503** | 0.95 | 0.83 | 0.00 |
+| `Gemma-4-E2B-NLA@L23` | google/gemma-4-E2B | local (full access) | **0.135 / 0.135** | not run on this set | not run on this set | not run on this set |
+| `nla-gemma3-27b-av@L41` | gemma-3-27b-it | hosted (API only) | pending | pending | pending | pending |
+
+**Full-access tier (white-box, local NLAs only).** Needs the raw activation, so it
+cannot be scored on the hosted NLAs above.
+
+| NLA (by name) | Bottleneck probe AUC, in-dist / OOD |
+|---|---|
+| `Gemma-4-E2B-NLA@L23` | 0.988 / 0.695 |
+
+The Llama NLA's mean reconstruction faithfulness is cosine 0.890, reported per-NLA
+rather than in the leaderboard because activation-space cosine is not on a common
+scale across base models. The Gemma-3 NLA is pending because its hosted inference
+server has returned 502 since about 2026-06-05, not because of a harness error (an
+identical request returns 200 for Llama). See the
+[access tiers](#access-tiers-api-runnable-vs-full-access) section for why only the
+hosted-on-the-same-protocol metrics line up across NLAs.
 
 ![Cross-NLA results: held-out doc retrieval across the tested NLAs (left) and the Gemma-4-E2B bottleneck probe in-distribution vs out-of-distribution (right), attributed by NLA name.](results/cross_nla/cross_nla_docret_comparison.png)
 
@@ -350,8 +409,10 @@ hash), the dataset, the matcher backend, and the date. `nla_name()` in
 - **Read differentially.** Compare every number to the frequency-and-length
   matched control and the noise floor, not in isolation.
 - **Hosted-API subset.** The probe and emergence axes need raw activations, which
-  the hosted API does not expose. Over the API you can run the verbalizer-side and
-  retention evals, and run the probe axes against a local NLA.
+  the hosted API does not expose, so they are full-access only. Over the API you can
+  run the full API tier (retention, doc retrieval, discrimination, misuse tests).
+  See [access tiers](#access-tiers-api-runnable-vs-full-access) for the exact split,
+  which is also queryable in code via `nla_eval.access`.
 
 The rationale behind these choices, including two external expert reviews, is in
 [`DESIGN_REVIEW.md`](DESIGN_REVIEW.md) and [`docs/`](docs/).
