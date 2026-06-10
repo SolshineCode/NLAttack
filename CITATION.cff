@@ -15,6 +15,7 @@ authors:
     alias: SolshineCode
     email: caleb.deleeuw@gmail.com
 version: "0.1.0"
+license: Apache-2.0
 url: "https://github.com/SolshineCode/NLAttack"
 repository-code: "https://github.com/SolshineCode/NLAttack"
 keywords:

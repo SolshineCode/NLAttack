@@ -15,7 +15,7 @@ methodology, and tells you how to run, extend, and cite the suite.
 
 - Repository: https://github.com/SolshineCode/NLAttack
 - Status: research software, actively developed. APIs may change.
-- License: not yet specified (see [License](#license)).
+- License: Apache-2.0 (see [License](#license)).
 
 ---
 
@@ -331,10 +331,11 @@ others reproduce and compare against the exact NLA and suite version.
 
 ## License
 
-No license file is present yet, so default copyright applies (all rights reserved)
-until one is added. If you intend to use or redistribute this work, contact the
-author. Adding an OSI-approved license (for example Apache-2.0 or MIT) is
-recommended before wider release.
+NLAttack is licensed under the Apache License 2.0. See [`LICENSE`](LICENSE) for
+the full terms and [`NOTICE`](NOTICE) for the attribution notice. You may use,
+modify, and redistribute it, including commercially, provided you retain the
+copyright, attribution, and license notices and state any changes you made
+(Apache-2.0 Section 4). The license also includes an explicit patent grant.
 
 ## Contact
 
