@@ -53,10 +53,10 @@ NLAttack exists to evaluate an NLA on two fronts at once, and the families are
 designed so that one body of measurement serves both.
 
 1. **Fundamental capability.** Does the NLA work at all, on the basic level a weak
-   or early-training NLA actually operates at? This is the floor question: did a
-   concept survive the bottleneck, can a probe read it off the activation, does the
-   verbalizer surface it, does the reconstructor put it back. Families A, B, E, F,
-   H, I, J, K, and L cover this.
+   or early-training NLA actually operates at? This is the floor question, asked
+   four ways: did a concept survive the bottleneck? Can a probe still read it off
+   the activation? Does the verbalizer actually say it? And does the reconstructor
+   put it back? Families A, B, E, F, H, I, J, K, and L cover this.
 2. **Usefulness as a safety monitor.** If you read the NLA's text to watch what a
    model is doing, can you actually catch misuse? NLAttack grounds this in the
    concrete techniques and risk axes from Anthropic's LLM ATT&CK Navigator (see the
@@ -112,9 +112,9 @@ tactics is worse than its average hole rate suggests. And agentic orchestration,
 model chaining steps autonomously, is the single largest risk amplifier.
 
 NLAttack treats those findings as the test specification for "is this NLA a usable
-misuse monitor." `attack_concepts.py` encodes 14 tactics with their phase
-(pre/post-compromise), ARiES axis, and a benign neighbor each technique can launder
-into. The misuse tests then ask whether the bottleneck preserves what a monitor
+misuse monitor." `attack_concepts.py` encodes 18 techniques spanning 13 of the
+ATT&CK tactics, each with its phase (pre/post-compromise), ARiES axis, and a benign
+neighbor it can launder into. The misuse tests then ask whether the bottleneck preserves what a monitor
 needs: technique coverage weighted by risk, see-through against an obfuscation
 ladder, whether an attack term reconstructs as its benign neighbor (laundering),
 whether agentic-orchestration markers survive, and whether a real downstream
