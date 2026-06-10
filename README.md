@@ -15,7 +15,7 @@ methodology, and tells you how to run, extend, and cite the suite.
 
 - Repository: https://github.com/SolshineCode/NLAttack
 - Status: research software, actively developed. APIs may change.
-- License: not yet specified (see [License](#license)).
+- License: Apache-2.0 (see [License](#license)).
 
 ---
 
