@@ -2,11 +2,15 @@
 
 **An evaluation suite for Natural Language Autoencoders (NLAs).**
 
-NLAttack measures how faithfully a Natural Language Autoencoder turns a model's
-internal activations into human-readable text, and how well that text can be used
-to monitor model behavior, including deceptive or misaligned behavior. It ships a
-Python harness, a catalog of 118 evaluation plans across 13 families, ready-made
-adapters for hosted and local NLAs, and result artifacts.
+NLAttack answers two interconnected questions about a Natural Language Autoencoder.
+First, the capability question: how faithfully does the NLA turn a model's internal
+activations into human-readable text? Second, the safety question: is that text good
+enough to use as a monitor, in particular for the real-world LLM-misuse behavior
+documented in Anthropic's LLM ATT&CK Navigator? The same machinery answers both,
+because the gap between what the activation carries and what the verbalization says
+is exactly the blind spot an attacker would exploit against an NLA-based monitor. It
+ships a Python harness, a catalog of 118 evaluation plans across 13 families,
+ready-made adapters for hosted and local NLAs, and result artifacts.
 
 The design goal is to work even on weak, small, or early-training NLAs (where most
 metrics saturate or collapse) and to keep every claim honest with explicit null
@@ -43,6 +47,33 @@ https://transformer-circuits.pub/2026/nla/). Interactive NLAs for several open
 models are hosted on Neuronpedia (https://www.neuronpedia.org/nla), and an
 open-source training library is `kitft/natural_language_autoencoders`.
 
+## Two interconnected purposes
+
+NLAttack exists to evaluate an NLA on two fronts at once, and the families are
+designed so that one body of measurement serves both.
+
+1. **Fundamental capability.** Does the NLA work at all, on the basic level a weak
+   or early-training NLA actually operates at? This is the floor question: did a
+   concept survive the bottleneck, can a probe read it off the activation, does the
+   verbalizer surface it, does the reconstructor put it back. Families A, B, E, F,
+   H, I, J, K, and L cover this.
+2. **Usefulness as a safety monitor.** If you read the NLA's text to watch what a
+   model is doing, can you actually catch misuse? NLAttack grounds this in the
+   concrete techniques and risk axes from Anthropic's LLM ATT&CK Navigator (see the
+   background section below). Families C, D, G, and M cover this: attack-technique
+   survival, obfuscation see-through, dual-use intent laundering, kill-chain
+   co-occurrence, agentic-orchestration markers, and deception decodability.
+
+These are not two separate test suites bolted together. The misuse families are the
+capability machinery pointed at attack content. The single number that scores
+capability, the **bottleneck-minus-verbalizer gap**, is also the monitor's blind
+spot: every concept the activation carries but the verbalization drops is a place an
+attacker can route through undetected. Concretely, the misuse plans reuse the
+capability primitives. P037 is the probe-grounded version of the attack-laundering
+test, P038 is the probe-grounded version of the ARiES-axis test, and P040 turns the
+whole thesis ("an NLA bottleneck as a safety monitor") into a falsifiable downstream
+classifier experiment.
+
 ## What NLAttack measures, and why
 
 An NLA can fail on two distinct sides, and NLAttack scores both:
@@ -67,6 +98,29 @@ Two principles run through the suite:
   pure noise. Every probe reports a label-permutation floor, and a result counts
   as signal only when it clears that floor by a margin. Matcher-dependent effects
   are flagged by an ensemble-agreement check.
+
+## Background: the ATT&CK Navigator and the misuse families
+
+MITRE ATT&CK is a public knowledge base of real adversary tactics and techniques
+(reconnaissance, credential dumping, lateral movement, and so on). Anthropic's red
+team adapted it to language models in the **LLM ATT&CK Navigator**
+(https://red.anthropic.com/2026/attack-navigator/), which maps how LLM misuse falls
+across those tactics and scores risk on three ARiES axes: Threat, Vulnerability, and
+Impact. Two findings from that work shape the misuse families directly. Risk is not
+uniform across tactics, so a monitor with holes in the high-risk post-compromise
+tactics is worse than its average hole rate suggests. And agentic orchestration, a
+model chaining steps autonomously, is the single largest risk amplifier.
+
+NLAttack treats those findings as the test specification for "is this NLA a usable
+misuse monitor." `attack_concepts.py` encodes 14 tactics with their phase
+(pre/post-compromise), ARiES axis, and a benign neighbor each technique can launder
+into. The misuse tests then ask whether the bottleneck preserves what a monitor
+needs: technique coverage weighted by risk, see-through against an obfuscation
+ladder, whether an attack term reconstructs as its benign neighbor (laundering),
+whether agentic-orchestration markers survive, and whether a real downstream
+classifier reading the bottleneck can still flag malicious inputs (P040). A hole
+here is not an abstract capability gap. It is a specific technique an adversary can
+push through the NL bottleneck without the monitor noticing.
 
 ## Installation
 
@@ -111,7 +165,7 @@ Evaluate a hosted NLA on Neuronpedia (no API key, rate limited to 120 req/hr/IP)
 ```python
 from nla_eval import NeuronpediaNLA, EnsembleMatcher, Example, run
 
-# A dataset is a list of Example(id, text, concepts) — `concepts` are the
+# A dataset is a list of Example(id, text, concepts). The `concepts` are the
 # controlled concepts present in `text` that we check survived the bottleneck.
 my_dataset = [
     Example(id="ex1", text="The committee published its annual budget report",
