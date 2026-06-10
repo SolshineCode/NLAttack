@@ -6,7 +6,9 @@ NLAttack answers two interconnected questions about a Natural Language Autoencod
 First, the capability question: how faithfully does the NLA turn a model's internal
 activations into human-readable text? Second, the safety question: is that text good
 enough to use as a monitor, in particular for the real-world LLM-misuse behavior
-documented in Anthropic's LLM ATT&CK Navigator? The same machinery answers both,
+documented in Anthropic's
+[LLM ATT&CK Navigator](https://red.anthropic.com/2026/attack-navigator/)? The same
+machinery answers both,
 because the gap between what the activation carries and what the verbalization says
 is exactly the blind spot an attacker would exploit against an NLA-based monitor. It
 ships a Python harness, a catalog of 118 evaluation plans across 13 families,
@@ -42,10 +44,10 @@ NLAs over sparse autoencoders or linear probes is that the explanation is in
 natural language, so a person can read it and even edit it to intervene.
 
 NLAs are introduced in Anthropic's "Natural Language Autoencoders" work
-(https://www.anthropic.com/research/natural-language-autoencoders,
-https://transformer-circuits.pub/2026/nla/). Interactive NLAs for several open
-models are hosted on Neuronpedia (https://www.neuronpedia.org/nla), and an
-open-source training library is `kitft/natural_language_autoencoders`.
+([overview](https://www.anthropic.com/research/natural-language-autoencoders),
+[technical writeup](https://transformer-circuits.pub/2026/nla/)). Interactive NLAs
+for several open models are hosted on [Neuronpedia](https://www.neuronpedia.org/nla),
+and an open-source training library is `kitft/natural_language_autoencoders`.
 
 ## Two interconnected purposes
 
@@ -101,12 +103,12 @@ Two principles run through the suite:
 
 ## Background: the ATT&CK Navigator and the misuse families
 
-MITRE ATT&CK is a public knowledge base of real adversary tactics and techniques
-(reconnaissance, credential dumping, lateral movement, and so on). Anthropic's red
-team adapted it to language models in the **LLM ATT&CK Navigator**
-(https://red.anthropic.com/2026/attack-navigator/), which maps how LLM misuse falls
-across those tactics and scores risk on three ARiES axes: Threat, Vulnerability, and
-Impact. Two findings from that work shape the misuse families directly. Risk is not
+[MITRE ATT&CK](https://attack.mitre.org/) is a public knowledge base of real
+adversary tactics and techniques (reconnaissance, credential dumping, lateral
+movement, and so on). Anthropic's red team adapted it to language models in the
+**[LLM ATT&CK Navigator](https://red.anthropic.com/2026/attack-navigator/)**, which
+maps how LLM misuse falls across those tactics and scores risk on three ARiES axes:
+Threat, Vulnerability, and Impact. Two findings from that work shape the misuse families directly. Risk is not
 uniform across tactics, so a monitor with holes in the high-risk post-compromise
 tactics is worse than its average hole rate suggests. And agentic orchestration, a
 model chaining steps autonomously, is the single largest risk amplifier.
@@ -371,13 +373,14 @@ others reproduce and compare against the exact NLA and suite version.
 ## Acknowledgements and references
 
 - Natural Language Autoencoders: Anthropic
-  (https://www.anthropic.com/research/natural-language-autoencoders;
-  https://transformer-circuits.pub/2026/nla/).
-- Hosted NLAs and the inference API: Neuronpedia (https://www.neuronpedia.org/nla).
+  ([overview](https://www.anthropic.com/research/natural-language-autoencoders),
+  [technical writeup](https://transformer-circuits.pub/2026/nla/)).
+- Hosted NLAs and the inference API:
+  [Neuronpedia](https://www.neuronpedia.org/nla).
 - NLA training library: `kitft/natural_language_autoencoders`.
-- The misuse family is grounded in Anthropic's LLM ATT&CK Navigator
-  (https://red.anthropic.com/2026/attack-navigator/) and the MITRE ATT&CK
-  framework.
+- The misuse family is grounded in Anthropic's
+  [LLM ATT&CK Navigator](https://red.anthropic.com/2026/attack-navigator/) and the
+  [MITRE ATT&CK](https://attack.mitre.org/) framework.
 - The methodology draws on the probing-classifier literature (control tasks and
   selectivity), the SAE interpretability literature, and work on measuring
   emergence. The full reading list with arXiv ids is in
