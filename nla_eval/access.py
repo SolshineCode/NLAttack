@@ -108,28 +108,41 @@ LEADERBOARD_METRICS = {
 
 def tier(name: str) -> str:
     """Resolve the access tier for a module, family letter, or specific eval name.
-    Returns "api", "full_access", or "mixed" (or "unknown")."""
+    Returns "api", "full_access", or "mixed" (or "unknown"). Casing is normalized,
+    so "core"/"Core" and "a"/"A" both resolve."""
     if name in EVAL_TIER:
         return EVAL_TIER[name]
     if name in MODULE_TIER:
         return MODULE_TIER[name]
+    if name.lower() in MODULE_TIER:
+        return MODULE_TIER[name.lower()]
     if name in FAMILY_TIER:
         return FAMILY_TIER[name]
+    if name.upper() in FAMILY_TIER:
+        return FAMILY_TIER[name.upper()]
     return "unknown"
 
 
 def requires_full_access(name: str) -> bool:
     """True if `name` needs raw activations / weights / checkpoints (cannot run on a
     text-only hosted NLA). MIXED resolves to False here (its api part is runnable);
-    use EVAL_TIER for the exact sub-eval."""
-    return tier(name) == FULL
+    use EVAL_TIER for the exact sub-eval. Raises ValueError on an unknown name so a
+    typo fails fast rather than silently reading as runnable."""
+    t = tier(name)
+    if t == "unknown":
+        raise ValueError(f"Unknown module, family, or eval name: {name!r}")
+    return t == FULL
 
 
 def api_runnable(name: str) -> bool:
-    """True if `name` can be scored on a hosted, text-only NLA (api or mixed)."""
-    return tier(name) in (API, MIXED)
+    """True if `name` can be scored on a hosted, text-only NLA (api or mixed).
+    Raises ValueError on an unknown name (fail fast on typos)."""
+    t = tier(name)
+    if t == "unknown":
+        raise ValueError(f"Unknown module, family, or eval name: {name!r}")
+    return t in (API, MIXED)
 
 
-def leaderboard_metrics() -> list:
+def leaderboard_metrics() -> list[str]:
     """The protocol-anchored api-tier metrics that are comparable across NLAs."""
     return sorted(LEADERBOARD_METRICS)
