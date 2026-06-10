@@ -270,11 +270,37 @@ result. This is enforced in the family's documentation and result metadata.
 
 ## Reproducible findings to date
 
-These come with the suite (`results/`) and are stated with their caveats.
+These come with the suite (`results/`) and are stated with their caveats. Results
+are named by the NLA, not the base model (see the attribution section below).
+
+| NLA (by name) | Base model | Run mode | Concept retention | AV faithfulness (cos) | Doc retrieval, char / semantic | Bottleneck probe AUC |
+|---|---|---|---|---|---|---|
+| `Llama-3.3-70B-NLA-av@L53` | llama3.3-70b-it | Neuronpedia (hosted) | 0.95 | 0.890 | 0.396 / 0.503 | not available (no activation access over the API) |
+| `Gemma-4-E2B-NLA@L23` | google/gemma-4-E2B | local | not run on this set | not run on this set | 0.135 / 0.135 | 0.988 in-dist, 0.695 OOD |
+| `nla-gemma3-27b-av@L41` | gemma-3-27b-it | Neuronpedia (hosted) | pending | pending | pending | not available |
+
+Doc retrieval uses one identical protocol across NLAs (same documents, 12
+distractors so chance is 0.077, MiniLM embedder), which makes it the one number
+directly comparable across the tested NLAs. The Llama NLA also shows zero
+attack-to-benign laundering and 0.83 obfuscation see-through. The Gemma-3 NLA is
+pending because its hosted inference server has returned 502 since about
+2026-06-05, not because of a harness error (an identical request returns 200 for
+Llama).
+
+![Cross-NLA results: held-out doc retrieval across the tested NLAs (left) and the Gemma-4-E2B bottleneck probe in-distribution vs out-of-distribution (right), attributed by NLA name.](results/cross_nla/cross_nla_docret_comparison.png)
+
+The two sides tell different stories. The Llama NLA is verbalizer-strong: its AV
+text identifies the held-out source document well above chance. The Gemma-4-E2B NLA
+is the opposite, bottleneck-strong but verbalizer-weak: a linear probe reads
+in-distribution concepts off its activation at 0.988 AUC, yet its verbalization
+retrieves documents at 0.135 (chance 0.077, p = 0.08, not significant), so it sits
+at the conditioning wall. That gap is exactly what NLAttack is built to separate.
+
+The detail bullets, with caveats:
 
 - **Cross-NLA, hosted (no GPU).** On a fixed dataset, the **Llama-3.3-70B** NLA
   (`kitft-l53`) reaches concept retention 0.95, zero attack-to-benign laundering,
-  and mean AV faithfulness (cosine) 0.888. Held-out doc retrieval, matched to the
+  and mean AV faithfulness (cosine) 0.890. Held-out doc retrieval, matched to the
   Gemma-4 protocol below (same docs, 12 distractors so chance is 0.077, MiniLM
   embedder): char 0.396, semantic 0.503.
 - **Local Gemma-4-E2B NLA.** The bottleneck encodes in-distribution concepts at
