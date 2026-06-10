@@ -1,8 +1,9 @@
 """ATT&CK-keyed concept dictionary for the misuse suite (tests 11-20).
 
-Grounded in the LLM ATT&CK Navigator post: 14 tactics, the most-common techniques
-(malware dev, obfuscation, defense evasion), the highest-risk post-compromise set
-(lateral movement, credential dumping, web shell), and ARiES axis hints.
+Grounded in the LLM ATT&CK Navigator post: 18 techniques spanning 13 ATT&CK
+tactics, the most-common techniques (malware dev, obfuscation, defense evasion),
+the highest-risk post-compromise set (lateral movement, credential dumping, web
+shell), and ARiES axis hints.
 
 Each entry: term, tactic, phase (pre/post-compromise), aries_axis, and a benign
 neighbor it might launder into (for t13). Extend freely as new techniques appear.
