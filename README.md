@@ -321,6 +321,15 @@ result. This is enforced in the family's documentation and result metadata.
 These come with the suite (`results/`) and are stated with their caveats. Results
 are named by the NLA, not the base model (see the attribution section below).
 
+![NLAttack benchmark overview across all evaluated NLAs: concept retention on the shared dataset, in-domain held-out doc retrieval, and the Gemma-4-E2B bottleneck probe. Hosted NLAs are verbalizer-strong, while Gemma-4-E2B v0.1 is bottleneck-strong but verbalizer-weak and domain-specific.](results/cross_nla/benchmark_overview.png)
+
+The one-line read: the two hosted NLAs (Gemma-3, Llama) are verbalizer-strong, so a
+reader of their AV text recovers most concepts. The local Gemma-4-E2B v0.1 is the
+mirror image, its bottleneck probes near-perfectly in-distribution (0.988 AUC) but
+its verbalizer is weak and domain-specific, so it retrieves documents only weakly
+in-domain and surfaces nothing on the out-of-domain dataset below. Separating those
+two failure modes is the whole point of the suite.
+
 **API tier (the universal leaderboard, any NLA).** Doc retrieval is the headline
 column because its null is fixed by the protocol (same documents, 12 distractors so
 chance is 0.077, MiniLM embedder), so it is directly comparable across NLAs.
@@ -329,13 +338,25 @@ chance is 0.077, MiniLM embedder), so it is directly comparable across NLAs.
 |---|---|---|---|---|---|---|
 | `Llama-3.3-70B-NLA-av@L53` | llama3.3-70b-it | hosted (API only) | **0.396 / 0.503** | 0.95 | 0.83 | 0.00 |
 | `nla-gemma3-27b-av@L41` | gemma-3-27b-it | hosted (API only) | not yet run | 0.90 | 0.67 | 0.00 |
-| `Gemma-4-E2B-NLA@L23` | google/gemma-4-E2B | local (full access) | **0.135 / 0.135** | not run on this set | not run on this set | not run on this set |
+| `Gemma-4-E2B-NLA@L23` | google/gemma-4-E2B | local (full access) | **0.135 / 0.135** (in-domain) | 0.00 (out-of-domain) | n/a | 0.00 |
 
 The two hosted NLAs (Llama and Gemma-3) were run on the **identical 20-example
 dataset with the identical matcher**, so their retention, see-through, and
 laundering are directly comparable to each other. Doc retrieval is the column that
 is also comparable to the local Gemma-4 NLA, because its null is fixed by the
 protocol (12 distractors, chance 0.077). Gemma-3 doc retrieval is not yet run.
+
+The Gemma-4-E2B v0.1 row carries an **out-of-domain caveat**. It is a tiny,
+domain-specific NLA trained on a 4 GB consumer GPU; its model card states the
+verbalizer is at chance out-of-domain and only modestly above chance in-domain. The
+cross_nla dataset (general + attack sentences) is out-of-domain for it, so on the
+identical 20 examples its verbalizer emits generic hallucinations or empty strings
+(14 of 20 non-empty, none surfacing the input concept), giving 0.00 retention. That
+is verbalizer collapse on unfamiliar text, not a like-for-like capability gap with
+the general-purpose hosted NLAs. Its **fair, in-domain** numbers are the doc
+retrieval (0.135, weakly above chance) and the bottleneck probe (0.988 in-dist)
+below. The eval used the published v0.1 AV
+([`Solshine/gemma-4-e2b-nla-L23-av-v0_0_1`](https://huggingface.co/Solshine/gemma-4-e2b-nla-L23-av-v0_0_1)).
 
 ![Cross-NLA comparison of the two hosted NLAs (Gemma-3-27B and Llama-3.3-70B) on the identical dataset: concept retention, loss modes, AV faithfulness, and misuse-eval signals, attributed by NLA name.](results/cross_nla/cross_nla_comparison.png)
 
