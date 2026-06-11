@@ -1,9 +1,9 @@
 """Deception / misalignment MONITORING axes — can this NLA be used to CATCH
 deceptive or misaligned behavior?
 
-Adapted from the SAE deception-detection methodology in
-`deception-nanochat-sae-research` (same-prompt behavioral split + multi-judge
-honest-vs-deceptive labels), wired into NLAttack's EXISTING axes so it stays
+Adapted from a companion SAE deception-detection methodology (same-prompt
+behavioral split + multi-judge honest-vs-deceptive labels), wired into NLAttack's
+EXISTING axes so it stays
 coherent with the suite's two-sided structure and null-control discipline:
 
   bottleneck side  -> deception_probe          is honest-vs-deceptive linearly

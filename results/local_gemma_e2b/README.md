@@ -1,8 +1,8 @@
 # Bottleneck-probe results — local Gemma-4-E2B NLA
 
 Implements independent review **P0 #1** (ground truth at the bottleneck) against the
-local NLA at `deception-nanochat-sae-research/experiments/v8_nla_local`
-(read-only). The bottleneck = the L23 `activation_vector` the AV verbalizes;
+local Gemma-4-E2B NLA, whose activations come from the companion NLA-training repo
+(`<NLA_DATA_ROOT>/experiments/v8_nla_local`, read-only). The bottleneck = the L23 `activation_vector` the AV verbalizes;
 ground-truth concept presence = keyword in the source text. A linear probe
 (logistic regression, 5-fold CV) reads concepts off the bottleneck.
 
@@ -81,13 +81,14 @@ the *method* is what's validated here.)
 ## Reproduce
 
 ```bash
-cd C:/Users/caleb/deception-nanochat-sae-research
+# Point NLA_DATA_ROOT at your local NLA-training checkout (holds the activation parquets).
+export NLA_DATA_ROOT=/path/to/nla-training-repo
 # probe side (CPU, any time):
-KMP_DUPLICATE_LIB_OK=TRUE .venv-gemma4/Scripts/python.exe \
-  C:/Users/caleb/nla-eval-harness/experiments/local_gemma_e2b/probe_bottleneck.py
-KMP_DUPLICATE_LIB_OK=TRUE .venv-gemma4/Scripts/python.exe \
-  C:/Users/caleb/nla-eval-harness/experiments/local_gemma_e2b/probe_bottleneck.py \
-  --parquet experiments/v8_nla_local/data/stage0/fineweb_edu_chunk1.parquet \
+KMP_DUPLICATE_LIB_OK=TRUE python \
+  experiments/local_gemma_e2b/probe_bottleneck.py
+KMP_DUPLICATE_LIB_OK=TRUE python \
+  experiments/local_gemma_e2b/probe_bottleneck.py \
+  --parquet "$NLA_DATA_ROOT/experiments/v8_nla_local/data/stage0/fineweb_edu_chunk1.parquet" \
   --generic --out-suffix _fineweb
 # AV side (GPU, when free): experiments/local_gemma_e2b/verbalize_av.py
 ```

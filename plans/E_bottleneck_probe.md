@@ -12,10 +12,10 @@ High probe_acc + low av_matcher_acc ⇒ the NLA *kept* the concept; the AV/match
 lost it (NOT an NLA dropout). Only probe_acc *also* low ⇒ a genuine bottleneck drop.
 
 These plans build on `nla_eval/bottleneck_probe.py` (lazy sklearn, CPU) and the
-local Gemma-4-E2B NLA: L23 activations in
-`C:\Users\caleb\deception-nanochat-sae-research\experiments\v8_nla_local\data\stage0\*.parquet`
+local Gemma-4-E2B NLA: L23 activations in the companion NLA-training repo at
+`<NLA_DATA_ROOT>/experiments/v8_nla_local/data/stage0/*.parquet`
 (cols `detokenized_text_truncated`, `activation_vector`, `activation_layer`,
-`doc_id`); env `.venv-gemma4` (sklearn); AV checkpoint `av_v0_1_aux_readout`.
+`doc_id`); a venv with sklearn; an AV checkpoint from that repo.
 Prior result: in-dist AUC ~0.99, OOD ~0.70, probe−AV gap ~0.33 (n=2–3/corpus).
 Standing caveats for the whole family: **(a) keyword labels are noisy** (substring
 ≠ semantic presence) so probe AUC is an *upper bound* on honestly-detectable

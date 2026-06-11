@@ -6,6 +6,6 @@
   "null": 0.49225905396346564,
   "margin": 0.4399504315401375,
   "signal": true,
-  "source": "deception-nanochat-sae-research v3_layer12_activations.pt (nanochat-d32, L12)",
+  "source": "companion SAE-research repo: v3_layer12_activations.pt (nanochat-d32, L12)",
   "note": "bottleneck-side demo on real same-prompt honest-vs-deceptive behavioral split; verbalizer side (deception_discrimination) needs an AV"
 }
