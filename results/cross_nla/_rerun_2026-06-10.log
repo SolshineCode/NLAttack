@@ -1,0 +1,17 @@
+[matcher: ensemble(lexical,fuzzy,overlap)]
+[hosted NLAs: ['gemma-3-27b-it/kitft-l41', 'llama3.3-70b-it/kitft-l53']]
+
+=== nla-gemma3-27b-av@L41 (kitft/nla-gemma3-27b-av__gemma-3-27b-it__L41__kitft-l41) ===
+  FAILED: HTTPError: HTTP Error 500: Internal Server Error
+
+=== Llama-3.3-70B-NLA-av@L53 (kitft/Llama-3.3-70B-NLA-av__llama3.3-70b-it__L53__kitft-l53) ===
+  retention_rate     0.95
+  substitution_rate  0.0
+  drop_rate          0.05
+  mean_cos_sim       0.887
+  mean_mse           0.225
+  seethrough_ratio   0.833
+  laundering_rate    0.0
+  contested_rate     0.1
+
+wrote C:\Users\caleb\nla-eval-harness\results\cross_nla/cross_nla_summary.json (2 NLAs)

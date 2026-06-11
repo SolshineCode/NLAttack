@@ -136,8 +136,11 @@ class NeuronpediaNLA(NLA):
         self.last_truncated = 0
 
     # gateway codes worth retrying — the NLA inference server is on RunPod and
-    # cold-starts with 502/503/504; 429 is the documented rate limit.
-    _RETRY_CODES = (429, 502, 503, 504)
+    # cold-starts or transiently faults with 500/502/503/504; 429 is the documented
+    # rate limit. 500 is included because the hosted backend emits transient
+    # "NLA server error: 500" responses that clear on retry (seen on Gemma-3,
+    # 2026-06-10); a genuine persistent 500 still raises after the retry budget.
+    _RETRY_CODES = (429, 500, 502, 503, 504)
 
     def _explain(self, text: str, positions):
         import json
@@ -160,20 +163,22 @@ class NeuronpediaNLA(NLA):
                 **({"x-api-key": self.api_key} if self.api_key else {}),
             },
         )
+        # Per-code retry budgets: 429 (rate limit) uses retry_on_429; gateway/server
+        # transients (500/502/503/504) and network errors use retry_on_gateway.
         attempt = 0
-        max_attempts = max(self.retry_on_429, self.retry_on_gateway)
         while True:
             try:
                 with urllib.request.urlopen(req, timeout=self.timeout) as r:
                     return json.loads(r.read())
             except urllib.error.HTTPError as e:
-                if e.code in self._RETRY_CODES and attempt < max_attempts:
+                limit = self.retry_on_429 if e.code == 429 else self.retry_on_gateway
+                if e.code in self._RETRY_CODES and attempt < limit:
                     attempt += 1
                     time.sleep(min(30, 3 * (2 ** (attempt - 1))))  # 3,6,12,24,30s
                     continue
                 raise
             except urllib.error.URLError:
-                if attempt < max_attempts:
+                if attempt < self.retry_on_gateway:
                     attempt += 1
                     time.sleep(min(30, 3 * (2 ** (attempt - 1))))
                     continue

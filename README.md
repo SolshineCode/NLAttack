@@ -328,8 +328,23 @@ chance is 0.077, MiniLM embedder), so it is directly comparable across NLAs.
 | NLA (by name) | Base model | Access | Doc retrieval char / sem | Concept retention | Obfuscation see-through | Laundering |
 |---|---|---|---|---|---|---|
 | `Llama-3.3-70B-NLA-av@L53` | llama3.3-70b-it | hosted (API only) | **0.396 / 0.503** | 0.95 | 0.83 | 0.00 |
+| `nla-gemma3-27b-av@L41` | gemma-3-27b-it | hosted (API only) | not yet run | 0.90 | 0.67 | 0.00 |
 | `Gemma-4-E2B-NLA@L23` | google/gemma-4-E2B | local (full access) | **0.135 / 0.135** | not run on this set | not run on this set | not run on this set |
-| `nla-gemma3-27b-av@L41` | gemma-3-27b-it | hosted (API only) | pending | pending | pending | pending |
+
+The two hosted NLAs (Llama and Gemma-3) were run on the **identical 20-example
+dataset with the identical matcher**, so their retention, see-through, and
+laundering are directly comparable to each other. Doc retrieval is the column that
+is also comparable to the local Gemma-4 NLA, because its null is fixed by the
+protocol (12 distractors, chance 0.077). Gemma-3 doc retrieval is not yet run.
+
+![Cross-NLA comparison of the two hosted NLAs (Gemma-3-27B and Llama-3.3-70B) on the identical dataset: concept retention, loss modes, AV faithfulness, and misuse-eval signals, attributed by NLA name.](results/cross_nla/cross_nla_comparison.png)
+
+Gemma-3 and Llama trade off against each other. Gemma-3 reconstructs much more
+faithfully (cosine 0.979 versus 0.887, mse 0.043 versus 0.225) but retains slightly
+fewer concepts (0.90 versus 0.95) and is easier to fool with obfuscated attack text
+(see-through 0.67 versus 0.83). Neither launders attack terms into benign neighbors.
+Activation-space cosine is reported per-NLA rather than ranked, because it is not on
+a common scale across different base models.
 
 **Full-access tier (white-box, local NLAs only).** Needs the raw activation, so it
 cannot be scored on the hosted NLAs above.
@@ -338,17 +353,9 @@ cannot be scored on the hosted NLAs above.
 |---|---|
 | `Gemma-4-E2B-NLA@L23` | 0.988 / 0.695 |
 
-The Llama NLA's mean reconstruction faithfulness is cosine 0.890, reported per-NLA
-rather than in the leaderboard because activation-space cosine is not on a common
-scale across base models. The Gemma-3 NLA is pending because its hosted inference
-server has returned 502 since about 2026-06-05, not because of a harness error (an
-identical request returns 200 for Llama). See the
-[access tiers](#access-tiers-api-runnable-vs-full-access) section for why only the
-hosted-on-the-same-protocol metrics line up across NLAs.
+![Llama-3.3-70B vs Gemma-4-E2B on held-out doc retrieval (left) and the Gemma-4-E2B bottleneck probe in-distribution vs out-of-distribution (right), attributed by NLA name.](results/cross_nla/cross_nla_docret_comparison.png)
 
-![Cross-NLA results: held-out doc retrieval across the tested NLAs (left) and the Gemma-4-E2B bottleneck probe in-distribution vs out-of-distribution (right), attributed by NLA name.](results/cross_nla/cross_nla_docret_comparison.png)
-
-The two sides tell different stories. The Llama NLA is verbalizer-strong: its AV
+These two sides tell different stories. The Llama NLA is verbalizer-strong: its AV
 text identifies the held-out source document well above chance. The Gemma-4-E2B NLA
 is the opposite, bottleneck-strong but verbalizer-weak: a linear probe reads
 in-distribution concepts off its activation at 0.988 AUC, yet its verbalization
@@ -357,11 +364,13 @@ at the conditioning wall. That gap is exactly what NLAttack is built to separate
 
 The detail bullets, with caveats:
 
-- **Cross-NLA, hosted (no GPU).** On a fixed dataset, the **Llama-3.3-70B** NLA
-  (`kitft-l53`) reaches concept retention 0.95, zero attack-to-benign laundering,
-  and mean AV faithfulness (cosine) 0.890. Held-out doc retrieval, matched to the
-  Gemma-4 protocol below (same docs, 12 distractors so chance is 0.077, MiniLM
-  embedder): char 0.396, semantic 0.503.
+- **Cross-NLA, hosted (no GPU).** On one fixed 20-example dataset and matcher, the
+  **Llama-3.3-70B** NLA (`kitft-l53`) reaches concept retention 0.95, AV
+  faithfulness cosine 0.887 (mse 0.225), and obfuscation see-through 0.83; the
+  **Gemma-3-27B** NLA (`kitft-l41`) reaches retention 0.90, a much higher cosine
+  0.979 (mse 0.043), and see-through 0.67. Both show zero attack-to-benign
+  laundering. Llama held-out doc retrieval (12 distractors, chance 0.077, MiniLM):
+  char 0.396, semantic 0.503; Gemma-3 doc retrieval not yet run.
 - **Local Gemma-4-E2B NLA.** The bottleneck encodes in-distribution concepts at
   about 0.99 probe AUC and out-of-distribution concepts at about 0.70, so the
   bottleneck is not a uniform filter. The verbalizer is the weak side: held-out
