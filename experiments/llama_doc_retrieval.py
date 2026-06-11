@@ -8,11 +8,13 @@ Neuronpedia AV verbalizes up to 16 token positions of the doc (concatenated) —
 hosted API's nature. Same docs, same distractor count, same embedder otherwise.
 
 The eval parquet lives in your separate NLA-training checkout. Point NLA_DATA_ROOT
-at it (or pass --parquet), then run with a venv that has sentence-transformers + pyarrow:
+at it, then run with a venv that has sentence-transformers + pyarrow:
   NLA_DATA_ROOT=/path/to/nla-training-repo python experiments/llama_doc_retrieval.py
 """
 from __future__ import annotations
-import os, sys, json
+import os
+import sys
+import json
 from pathlib import Path
 
 NLATTACK = Path(__file__).resolve().parents[1]

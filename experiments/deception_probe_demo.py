@@ -11,7 +11,9 @@ NLA_DATA_ROOT at it (or edit PT below), then run with a venv that has torch + sk
   NLA_DATA_ROOT=/path/to/nla-training-repo python experiments/deception_probe_demo.py
 """
 from __future__ import annotations
-import os, sys, json
+import os
+import sys
+import json
 from pathlib import Path
 
 NLATTACK = Path(__file__).resolve().parents[1]
