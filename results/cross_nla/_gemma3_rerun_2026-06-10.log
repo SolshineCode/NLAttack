@@ -1,0 +1,14 @@
+[matcher: ensemble(lexical,fuzzy,overlap)]
+[hosted NLAs: ['gemma-3-27b-it/kitft-l41']]
+
+=== nla-gemma3-27b-av@L41 (kitft/nla-gemma3-27b-av__gemma-3-27b-it__L41__kitft-l41) ===
+  retention_rate     0.9
+  substitution_rate  0.0
+  drop_rate          0.1
+  mean_cos_sim       0.979
+  mean_mse           0.043
+  seethrough_ratio   0.667
+  laundering_rate    0.0
+  contested_rate     0.1
+
+wrote C:\Users\caleb\nla-eval-harness\results\cross_nla/cross_nla_summary.json (1 NLAs)

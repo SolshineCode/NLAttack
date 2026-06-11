@@ -136,8 +136,11 @@ class NeuronpediaNLA(NLA):
         self.last_truncated = 0
 
     # gateway codes worth retrying — the NLA inference server is on RunPod and
-    # cold-starts with 502/503/504; 429 is the documented rate limit.
-    _RETRY_CODES = (429, 502, 503, 504)
+    # cold-starts or transiently faults with 500/502/503/504; 429 is the documented
+    # rate limit. 500 is included because the hosted backend emits transient
+    # "NLA server error: 500" responses that clear on retry (seen on Gemma-3,
+    # 2026-06-10); a genuine persistent 500 still raises after the retry budget.
+    _RETRY_CODES = (429, 500, 502, 503, 504)
 
     def _explain(self, text: str, positions):
         import json

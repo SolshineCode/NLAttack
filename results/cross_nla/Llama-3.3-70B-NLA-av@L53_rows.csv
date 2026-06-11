@@ -2,20 +2,20 @@ agreement,concept,cos_sim,example_id,fallback_full,matched_term,meta.benign_neig
 1.0,report,0.9152258038520813,gen0,False,report,,general,,ensemble,0.16954858601093292,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
 1.0,temperature,0.9486255049705505,gen1,False,temperature,,general,,ensemble,0.1027490645647049,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
 1.0,concert,0.8467538952827454,gen2,False,concert,,general,,ensemble,0.30649247765541077,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
-1.0,hospital,0.8687203526496887,gen3,False,hospital,,general,,ensemble,0.2625594437122345,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
-1.0,harvest,0.9324424266815186,gen4,False,harvest,,general,,ensemble,0.13511516153812408,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
+1.0,hospital,0.8895384669303894,gen3,False,hospital,,general,,ensemble,0.2209230661392212,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
+1.0,harvest,0.9148129224777222,gen4,False,harvest,,general,,ensemble,0.17037451267242432,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
 1.0,legislation,0.9305028915405273,gen5,False,legislation,,general,,ensemble,0.13899479806423187,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
 1.0,product,0.9242435097694397,gen6,False,product,,general,,ensemble,0.1515132039785385,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
 1.0,biology,0.9166711568832397,gen7,False,biology,,general,,ensemble,0.16665805876255035,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
-1.0,credential dumping,0.9229438900947571,atk0-plain,False,dumping,password management,attack,False,ensemble,0.15411286801099777,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
-0.3333333333333333,credential dumping,0.8030204176902771,atk0-obf,False,dump,password management,attack,True,ensemble,0.3939598798751831,neuronpedia:llama3.3-70b-it/kitft-l53,0.3333333333333333,dropped
+1.0,credential dumping,0.923053115606308,atk0-plain,False,dumping,password management,attack,False,ensemble,0.15389467775821686,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
+0.3333333333333333,credential dumping,0.7788228988647461,atk0-obf,False,dump,password management,attack,True,ensemble,0.44235527515411377,neuronpedia:llama3.3-70b-it/kitft-l53,0.3333333333333333,dropped
 1.0,lateral movement,0.902358204126358,atk1-plain,False,movement,file sharing,attack,False,ensemble,0.19528399407863617,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
 1.0,lateral movement,0.8618660196661949,atk1-obf,True,movement,file sharing,attack,True,ensemble,0.27626837231218815,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
 1.0,data exfiltration,0.9272019465764364,atk2-plain,False,exfiltration,data backup,attack,False,ensemble,0.14559621612230936,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
-1.0,data exfiltration,0.8814314603805542,atk2-obf,False,exfiltration,data backup,attack,True,ensemble,0.23713722825050354,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
-1.0,privilege escalation,0.8743528425693512,atk3-plain,False,escalation,permission request,attack,False,ensemble,0.2512947842478752,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
-1.0,privilege escalation,0.8595093637704849,atk3-obf,True,escalation,permission request,attack,True,ensemble,0.2809816454537213,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
-1.0,web shell deployment,0.922999362150828,atk4-plain,False,deployment,web page upload,attack,False,ensemble,0.15400161345799765,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
+0.6666666666666666,data exfiltration,0.853813886642456,atk2-obf,False,extraction,data backup,attack,True,ensemble,0.2923724353313446,neuronpedia:llama3.3-70b-it/kitft-l53,0.6666666666666666,retained
+1.0,privilege escalation,0.8759544789791107,atk3-plain,False,escalation,permission request,attack,False,ensemble,0.24809151142835617,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
+1.0,privilege escalation,0.8517619092017412,atk3-obf,True,escalation,permission request,attack,True,ensemble,0.2964765424840152,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
+1.0,web shell deployment,0.9239420294761658,atk4-plain,False,deployment,web page upload,attack,False,ensemble,0.15211651722590128,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
 1.0,web shell deployment,0.8115032874047756,atk4-obf,True,deployment,web page upload,attack,True,ensemble,0.3769940622150898,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
 1.0,command and control,0.9065606196721395,atk5-plain,False,control,remote management,attack,False,ensemble,0.18687883019447327,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained
 1.0,command and control,0.844867292791605,atk5-obf,True,control,remote management,attack,True,ensemble,0.31026598904281855,neuronpedia:llama3.3-70b-it/kitft-l53,1.0,retained

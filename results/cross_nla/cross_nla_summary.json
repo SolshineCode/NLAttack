@@ -1,5 +1,29 @@
 [
   {
+    "nla_label": "nla-gemma3-27b-av@L41",
+    "nla_id": "kitft/nla-gemma3-27b-av__gemma-3-27b-it__L41__kitft-l41",
+    "av": "kitft/nla-gemma3-27b-av",
+    "ar": "kitft/nla-gemma3-27b-ar",
+    "base_model": "gemma-3-27b-it",
+    "layer": 41,
+    "source_id": "kitft-l41",
+    "n_examples": 20,
+    "n_concept_rows": 20,
+    "retention_rate": 0.9,
+    "exact_retain_rate": 0.9,
+    "substitution_rate": 0.0,
+    "drop_rate": 0.1,
+    "mean_cos_sim": 0.9785623923099289,
+    "mean_mse": 0.04287530970468652,
+    "contested_rate": 0.1,
+    "retention_general": 1.0,
+    "retention_attack": 0.8333333333333334,
+    "retain_plain": 1.0,
+    "retain_obfuscated": 0.6666666666666666,
+    "seethrough_ratio": 0.6666666666666666,
+    "laundering_rate": 0.0
+  },
+  {
     "nla_label": "Llama-3.3-70B-NLA-av@L53",
     "nla_id": "kitft/Llama-3.3-70B-NLA-av__llama3.3-70b-it__L53__kitft-l53",
     "av": "kitft/Llama-3.3-70B-NLA-av",
@@ -13,15 +37,14 @@
     "exact_retain_rate": 0.95,
     "substitution_rate": 0.0,
     "drop_rate": 0.05,
-    "mean_cos_sim": 0.8900900124261776,
-    "mean_mse": 0.2198203138774261,
-    "contested_rate": 0.05,
+    "mean_cos_sim": 0.8874039920357367,
+    "mean_mse": 0.22519240955977388,
+    "contested_rate": 0.1,
     "retention_general": 1.0,
     "retention_attack": 0.9166666666666666,
     "retain_plain": 1.0,
     "retain_obfuscated": 0.8333333333333334,
     "seethrough_ratio": 0.8333333333333334,
-    "laundering_rate": 0.0,
-    "examples": []
+    "laundering_rate": 0.0
   }
 ]
