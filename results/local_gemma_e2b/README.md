@@ -1,6 +1,6 @@
 # Bottleneck-probe results — local Gemma-4-E2B NLA
 
-Implements Hermes review **P0 #1** (ground truth at the bottleneck) against the
+Implements independent review **P0 #1** (ground truth at the bottleneck) against the
 local NLA at `deception-nanochat-sae-research/experiments/v8_nla_local`
 (read-only). The bottleneck = the L23 `activation_vector` the AV verbalizes;
 ground-truth concept presence = keyword in the source text. A linear probe
@@ -35,7 +35,7 @@ mean AUC ≈ **0.695** → barely above chance; balanced accuracy ≈ baseline.
    at ~0.70. "Concept survival" is confounded by whether the concept is even in
    the bottleneck's encodable subspace — which depends on the NLA's training
    distribution, not just the concept.
-2. **This is exactly Hermes #1 made concrete.** Where probe AUC is high (~0.99),
+2. **This is exactly review item #1 made concrete.** Where probe AUC is high (~0.99),
    any later "drop" in the AV verbalization is *verbalizer/matcher loss, not NLA
    dropout*. The probe gives the ground truth the AV-text matcher cannot.
 3. The probe side is **CPU-only** (cached activations + sklearn), so it runs even
@@ -55,7 +55,7 @@ The full disentanglement: `probe_acc` (bottleneck ground truth) vs `av_acc`
 **~0.33 of the apparent concept loss is attributable to the verbalizer + matcher,
 NOT the NLA bottleneck.** The bottleneck holds the concept (probe ~0.92); the AV
 text + matcher only recover ~0.58–0.60 of it. This is precisely the confound the
-Hermes review (P0 #1) said would invalidate naive AV-text retention claims — now
+independent review (P0 #1) said would invalidate naive AV-text retention claims — now
 measured, not assumed. Raw verbalizations in `av_verbalizations.jsonl`.
 
 (Note: `av_v0_1_aux_readout/block_to000100` is an early 100-step checkpoint; the

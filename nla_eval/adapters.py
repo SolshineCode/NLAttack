@@ -224,7 +224,7 @@ class NeuronpediaNLA(NLA):
     def _pack(self, recs):
         """Bundle a set of position-records into {text, cos, mse, positions}.
         cos/mse are the AR activation-space faithfulness at those positions —
-        how trustworthy this verbalization is (Hermes review P1#5 / item B)."""
+        how trustworthy this verbalization is (independent review P1#5 / item B)."""
         return {
             "text": "\n".join(r.get("description", "") for r in recs),
             "cos": self._mean([r.get("cosine_similarity") for r in recs]),

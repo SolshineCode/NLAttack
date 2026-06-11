@@ -1,7 +1,7 @@
 # Family H — Faithfulness / AR-fidelity
 
 Activation-space faithfulness plans (P071–P080). This family operationalizes
-Hermes review **P1 #5** (AR fidelity unmeasured): if the AR faithfully
+independent review **P1 #5** (AR fidelity unmeasured): if the AR faithfully
 reconstructs a *laundered* activation ("credential dumping" → "credential
 stuffing" direction), the deception lives in the **AR**, not the NLA bottleneck —
 so AR drift must be measured in **activation space** (the AR maps AV text back to

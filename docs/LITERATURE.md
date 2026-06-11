@@ -1,8 +1,7 @@
 # Literature informing NLA evaluation (verified arXiv list + synthesis)
 
-Compiled via an Antigravity CLI (`agy`, Gemini-3.5) arXiv search, then
-**cross-checked by Claude against direct arXiv searches** — only IDs confirmed in
-those searches are kept; attributions corrected where `agy` erred. Each entry
+Compiled via an automated arXiv search, then cross-checked against direct arXiv
+searches; only IDs confirmed in those searches are kept. Each entry
 notes relevance to *evaluating NLAs, especially weak/tiny ones*. NLA =
 `activation → AV verbalizer → text → AR reconstructor → activation`.
 

@@ -1,7 +1,7 @@
 # Rudimentary-NLA triage of the 100 plans
 
 Derived from the two independent reviews (`reviews/SUMMARY.md`). Tiers reflect
-where Hermes and Antigravity **converged** on what to run vs shelve when the NLA
+where the two independent reviews **converged** on what to run vs shelve when the NLA
 is small/weak (degenerate AV, near-random AR, low-dim bottleneck, tiny n). Use
 this to sequence work on a rudimentary NLA; the full per-plan detail and floor
 versions are in `reviews/`.
@@ -58,12 +58,12 @@ The remaining ~78 plans are runnable on a rudimentary NLA **only via the
 floor/probe-only adaptation** each reviewer specified (bypass the degenerate AV;
 coarsen the metric to binary/rank/pooled; relax the matcher to
 character/edit-distance/numeric; add a shuffled-activation control). See the
-per-plan "FLOOR VERSION" notes in `reviews/hermes/` and `reviews/antigravity/`.
+per-plan "FLOOR VERSION" notes in `reviews/reviewer-a/` and `reviews/reviewer-b/`.
 
 ## Reviewer disagreements (decide per your NLA) — from `reviews/SUMMARY.md`
-- **P089** layer×distribution: Hermes run / Antigravity skip → run only with
+- **P089** layer×distribution: reviewer A run / reviewer B skip → run only with
   several layers dumped and enough n.
-- **Family F** wholesale: on a truly degenerate AV, follow Hermes — replace
+- **Family F** wholesale: on a truly degenerate AV, follow reviewer A — replace
   P051–P055 with probe-only matcher-noise-floor ablations on fixed human text.
 - **Family D** picks: prefer the probe-grounded P034/P037/P040 over coverage/
   obfuscation heatmaps (matcher hallucination on generic text).

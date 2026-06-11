@@ -3,7 +3,7 @@
 Ten plans (P011–P020) on the *laundering surface*: when a weak NLA cannot retain
 concept C exactly, what does it return instead, and is that substitution a
 **property of the NLA bottleneck** or an **artifact of the AV verbalizer / the
-matcher's similarity topology**? The Hermes review flags adjacency tests (2, 3,
+matcher's similarity topology**? The independent review flags adjacency tests (2, 3,
 6, 7, 13) as the prime suspects for matcher-topology artifacts (`DESIGN_REVIEW.md`
 P0 #2). Every plan below therefore (a) leans on the `EnsembleMatcher` >2/3
 agreement rule and `core.contested_rate`, and (b) where activations are

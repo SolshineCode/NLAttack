@@ -1,5 +1,5 @@
 """Confabulation scorers — the #1 stated limitation of NLAs (Anthropic NLA paper,
-surfaced by the open Hermes review 2026-06-08): AV verbalizations are often
+surfaced by the open independent review 2026-06-08): AV verbalizations are often
 "thematically faithful but specifically wrong" — confident specific claims the
 context does not support. Concept-survival checks *presence*, not *truth*, so it
 misses this. For the misuse / ATT&CK monitor use-case this is critical: a

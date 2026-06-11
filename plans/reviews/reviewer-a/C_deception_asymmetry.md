@@ -1,4 +1,4 @@
-# Hermes critique — C_deception_asymmetry (run in two 5-plan halves to avoid the output-length limit)
+# Reviewer A critique — C_deception_asymmetry (run in two 5-plan halves to avoid the output-length limit)
 
 
 session_id: 20260605_124926_47d8b7

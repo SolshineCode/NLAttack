@@ -1,6 +1,6 @@
 """Floor tooling for evaluating RUDIMENTARY NLAs.
 
-Both external reviews (Hermes nemotron-3-ultra, Antigravity gemini-3.5-flash)
+Both independent external reviews
 converged on the same point: on a weak/tiny NLA the AV is degenerate and the AR
 near-random, so end-to-end metrics collapse and high probe AUCs can be overfit.
 The fix is a small set of probe-only / activation-space floor checks that still

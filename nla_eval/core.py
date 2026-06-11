@@ -164,7 +164,7 @@ def group_retention(rows: List[ConceptRow], key) -> Dict[Any, float]:
 def contested_rate(rows: List[ConceptRow]) -> float:
     """Fraction of concepts where matcher topologies DISAGREE (0 < agreement < 1).
     High = the retention/laundering signal is matcher-dependent and should not be
-    claimed as an NLA property without probe ground truth (Hermes P0 #2)."""
+    claimed as an NLA property without probe ground truth (review note P0 #2)."""
     scored = [r for r in rows if r.agreement is not None]
     if not scored:
         return float("nan")
@@ -180,7 +180,7 @@ def faithfulness_weighted_retention(rows: List[ConceptRow], default: float = 1.0
     """Retention with each concept weighted by AR faithfulness (cos_sim, clamped
     to [0,1]). A 'retained' concept whose activation was reconstructed poorly
     (low cos) counts less — it may be a verbalizer artifact, not real survival.
-    Rows without a faithfulness score use `default`. Addresses Hermes P1#5."""
+    Rows without a faithfulness score use `default`. Addresses review note P1#5."""
     num = den = 0.0
     for r in rows:
         w = default if r.cos_sim is None else max(0.0, min(1.0, r.cos_sim))

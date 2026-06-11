@@ -65,7 +65,7 @@ def minimal_pair_discrimination(pairs, verbalize_fn: VerbalizeFn,
     Metric = **AUC** over the matcher's CONTINUOUS pos-vs-neg presence scores
     (`soft_score`), so it is threshold-free and **chance = 0.5** (not 0). This
     avoids the earlier flaw of conflating AV conditioning with the matcher's
-    binary recall (Hermes review P0a). Reported with:
+    binary recall (independent review P0a). Reported with:
       * a label-PERMUTATION null (mean + p-value),
       * `matcher_ceiling_auc` — the matcher's own discriminability on text that
         literally states vs omits the concept; the AV-AUC cannot exceed this, so
@@ -160,7 +160,7 @@ def doc_retrieval(items: Sequence[Tuple[object, str]], verbalize_fn: VerbalizeFn
     rank ALL source docs by similarity to the verbalization; metric = retrieval@1
     (+ MRR). Chance = 1/N. Rises as the AV conditions on the activation.
 
-    Hermes P0b: char-3-gram cosine rewards lexical PARROTING, not semantic
+    review note P0b: char-3-gram cosine rewards lexical PARROTING, not semantic
     verbalization. So when `embed_fn` (e.g. sentence-transformers) is given we
     compute BOTH and report `lexical_minus_semantic_gap` — a large positive gap
     means the AV is winning by copying surface tokens, not by verbalizing. The
@@ -197,7 +197,7 @@ def doc_retrieval(items: Sequence[Tuple[object, str]], verbalize_fn: VerbalizeFn
 def prior_deviation(items: Sequence[Tuple[object, str]], verbalize_fn: VerbalizeFn,
                     mean_activation, embed_fn=None) -> VerbAxisResult:
     """Does the AV use the ACTIVATION, or just the concept PRIOR? (the team's own
-    contrastive method, Hermes P1c.) For each (act, doc): compare
+    contrastive method, review note P1c.) For each (act, doc): compare
     sim(AV(act), doc) to sim(AV(mean_activation), doc). Positive mean delta = the
     activation adds doc-specific signal beyond an unconditioned/prior verbalization.
     `mean_activation` = a single 'prior' activation (e.g. dataset mean)."""
@@ -226,7 +226,7 @@ def prior_deviation(items: Sequence[Tuple[object, str]], verbalize_fn: Verbalize
 def mode_collapse(activations, verbalize_fn: VerbalizeFn) -> VerbAxisResult:
     """Diversity of verbalizations across DIFFERENT activations. An AV that emits
     near-identical text for everything passes discrimination yet is useless
-    (Hermes P1). raw = distinct-2 ratio (unique bigrams / total). Low = collapse."""
+    (review note P1). raw = distinct-2 ratio (unique bigrams / total). Low = collapse."""
     acts = list(activations)
     if len(acts) < 3:
         return VerbAxisResult("mode_collapse", "verbalizer", False,

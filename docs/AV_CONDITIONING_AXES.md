@@ -67,7 +67,7 @@ emergence.run_capability(X, texts, concepts, allow_low_coverage=True)
 The real fix for coverage is semantic (not keyword) labels (plan P050) to lift the
 concept count past the floor.
 
-## Update 2026-06-08 — hardened after two Hermes reviews
+## Update 2026-06-08 — hardened after two independent reviews
 
 - **`minimal_pair_discrimination` is now AUC-based** (chance = 0.5), with a
   permutation p-value and a `matcher_ceiling_auc` covariate, instead of the

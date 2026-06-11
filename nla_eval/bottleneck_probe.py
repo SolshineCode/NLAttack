@@ -1,4 +1,4 @@
-"""Bottleneck probes — ground truth concept presence (Hermes review P0 #1).
+"""Bottleneck probes — ground truth concept presence (independent review P0 #1).
 
 The harness's normal signal (does concept C appear in the AV verbalization) is
 confounded: the AV verbalizer + the matcher are two extra lossy filters. To know
@@ -10,7 +10,7 @@ fed to the verbalizer (= the AR's reconstruction target). If a linear probe can
 read concept C off that vector, the concept IS present at the bottleneck —
 independent of whether the verbalizer lexicalized it or the matcher caught it.
 
-This gives the disentanglement Hermes asked for:
+This gives the disentanglement the review asked for:
 
     probe_auc(C)            — concept present at the bottleneck? (ground truth)
     av_matcher_acc(C)       — did the end-to-end AV+matcher report it?
@@ -99,7 +99,7 @@ def probe_concept(activations, labels, n_splits: int = 5, seed: int = 0,
     """Cross-validated linear probe (logistic regression) on activations -> label,
     WITH a label-permutation null control. At small n a probe can score high on
     pure noise via overfit; the permutation control gives the noise floor so you
-    can tell real bottleneck signal from overfit (Hermes + Antigravity both flag
+    can tell real bottleneck signal from overfit (both independent reviews flag
     this as the essential control for rudimentary NLAs). `signal` is True only if
     the real AUC clears control mean + 2*std.
 
