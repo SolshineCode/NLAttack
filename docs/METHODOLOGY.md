@@ -124,9 +124,9 @@ push through the NL bottleneck without the monitor noticing.
 - **Hosted-API subset.** The probe and emergence axes need raw activations, which
   the hosted API does not expose, so they are full-access only. Over the API you can
   run the full API tier (retention, doc retrieval, discrimination, misuse tests).
-  See [access tiers](#access-tiers-api-runnable-vs-full-access) for the exact split,
+  See [access tiers](EVALUATIONS.md#access-tiers-api-runnable-vs-full-access) for the exact
   which is also queryable in code via `nla_eval.access`.
 
 The rationale behind these choices, including two external expert reviews, is in
-[`DESIGN_REVIEW.md`](../DESIGN_REVIEW.md) and [`docs/`]().
+[`DESIGN_REVIEW.md`](../DESIGN_REVIEW.md) and the [docs directory](.).
 
