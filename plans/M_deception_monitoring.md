@@ -1,7 +1,7 @@
 # Family M — Deception / misalignment monitoring
 
 Can this NLA be used to **catch deceptive or misaligned behavior**? Adapted from
-the SAE deception-detection methodology in `deception-nanochat-sae-research`
+a companion SAE deception-detection methodology
 (same-prompt behavioral split + multi-judge honest-vs-deceptive labels) and wired
 into NLAttack's existing axes (`nla_eval/deception.py`). Coherent with the suite's
 two-sided structure (bottleneck vs verbalizer), its permutation-null discipline

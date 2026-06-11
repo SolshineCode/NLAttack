@@ -10,15 +10,16 @@ A concept with high probe_acc but low av_matcher_acc was KEPT by the NLA but los
 by the verbalizer/matcher — NOT an NLA dropout. This is the number that converts
 NLAttack's AV-text observations into NLA-bottleneck claims.
 
-Run (needs GPU free; uses the deception repo's venv for transformers/peft/bnb):
-  cd C:/Users/caleb/deception-nanochat-sae-research
-  KMP_DUPLICATE_LIB_OK=TRUE .venv-gemma4/Scripts/python.exe \
-    C:/Users/caleb/nla-eval-harness/experiments/local_gemma_e2b/verbalize_av.py \
-    --av-checkpoint experiments/v8_nla_local/checkpoints/av_v0_1_aux_readout/block_to000100/final \
+Run (needs GPU free; use a venv with transformers/peft/bnb). The corpus parquet and
+the AV checkpoint live in your separate NLA-training checkout; point NLA_DATA_ROOT at it:
+  NLA_DATA_ROOT=/path/to/nla-training-repo KMP_DUPLICATE_LIB_OK=TRUE \
+    python experiments/local_gemma_e2b/verbalize_av.py \
+    --av-checkpoint /path/to/nla-training-repo/experiments/v8_nla_local/checkpoints/<av-ckpt>/final \
     --limit 300
 """
 from __future__ import annotations
 
+import os
 import sys
 import argparse
 from pathlib import Path
@@ -32,10 +33,9 @@ from nla_eval.bottleneck_probe import (
     auto_select_concepts, run_probe_suite, attach_av_accuracy, label_by_keyword, save_csv,
 )
 
-PARQUET = Path(
-    r"C:\Users\caleb\deception-nanochat-sae-research\experiments\v8_nla_local"
-    r"\data\stage0\gemma4_deception_chunk1.parquet"
-)
+# Corpus parquet produced by the NLA-training repo, kept separate from this harness.
+_DATA_ROOT = Path(os.environ.get("NLA_DATA_ROOT", "path/to/nla-training-repo"))
+PARQUET = _DATA_ROOT / "experiments/v8_nla_local/data/stage0/gemma4_deception_chunk1.parquet"
 OUT = NLATTACK / "results" / "local_gemma_e2b"
 CANDIDATES = ["report", "team", "company", "money", "earnings", "customer",
               "decision", "risk", "financial", "product", "client", "market"]

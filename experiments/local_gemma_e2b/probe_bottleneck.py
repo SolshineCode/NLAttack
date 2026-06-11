@@ -7,13 +7,13 @@ That is ground-truth concept presence, independent of the AV verbalizer + matche
 
 CPU only (sklearn) — does NOT touch the GPU, so it coexists with other GPU jobs.
 
-Run with the deception repo's venv (has pyarrow/sklearn/numpy):
-  cd C:/Users/caleb/deception-nanochat-sae-research
-  .venv-gemma4/Scripts/python.exe \
-     C:/Users/caleb/nla-eval-harness/experiments/local_gemma_e2b/probe_bottleneck.py
+The corpus parquet lives in your separate NLA-training checkout. Point NLA_DATA_ROOT
+at it (or pass --parquet), then run with a venv that has pyarrow/sklearn/numpy:
+  NLA_DATA_ROOT=/path/to/nla-training-repo python experiments/local_gemma_e2b/probe_bottleneck.py
 """
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -26,10 +26,9 @@ from nla_eval.bottleneck_probe import (
 )
 
 # Deception corpus parquet (read-only). L23 activations + source text.
-PARQUET = Path(
-    r"C:\Users\caleb\deception-nanochat-sae-research\experiments\v8_nla_local"
-    r"\data\stage0\gemma4_deception_chunk1.parquet"
-)
+# Produced by the NLA-training repo, kept separate from this harness.
+_DATA_ROOT = Path(os.environ.get("NLA_DATA_ROOT", "path/to/nla-training-repo"))
+PARQUET = _DATA_ROOT / "experiments/v8_nla_local/data/stage0/gemma4_deception_chunk1.parquet"
 OUT_DIR = NLATTACK / "results" / "local_gemma_e2b"
 
 # Candidate concepts plausibly present in a business/deception scenario corpus.

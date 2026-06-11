@@ -1,4 +1,4 @@
-"""Adapter for the LOCAL Gemma-4-E2B NLA (deception-nanochat-sae-research, v8).
+"""Adapter for the LOCAL Gemma-4-E2B NLA (trained in a companion repo, v8).
 
 This NLA is `activation → AV verbalizer → text` (the AR reconstructs the
 activation). Unlike a text→text model, its natural input is an activation

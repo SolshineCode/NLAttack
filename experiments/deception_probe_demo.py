@@ -1,26 +1,27 @@
 """Demo: deception-monitoring bottleneck probe (Family M / P113) on REAL
-same-prompt honest-vs-deceptive behavioral-split activations from
-deception-nanochat-sae-research. CPU only.
+same-prompt honest-vs-deceptive behavioral-split activations from a companion
+NLA-training repo (the activation .pt is not bundled here). CPU only.
 
 Reproduces the source repo's ~0.87 balanced-accuracy baseline through NLAttack's
 own permutation-null-controlled probe — validating the deception family on real
 data. The verbalizer side (P114 deception_discrimination) additionally needs an AV.
 
-Run with the deception repo's venv (has torch + sklearn):
-  cd C:/Users/caleb/deception-nanochat-sae-research
-  .venv-gemma4/Scripts/python.exe C:/Users/caleb/nla-eval-harness/experiments/deception_probe_demo.py
+The activation tensor lives in your separate NLA-training checkout. Point
+NLA_DATA_ROOT at it (or edit PT below), then run with a venv that has torch + sklearn:
+  NLA_DATA_ROOT=/path/to/nla-training-repo python experiments/deception_probe_demo.py
 """
 from __future__ import annotations
-import sys, json
+import os, sys, json
 from pathlib import Path
 
 NLATTACK = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(NLATTACK))
 from nla_eval import deception as D
 
-# same-prompt honest-vs-deceptive behavioral split (model's own choice, judge-labeled)
-PT = Path(r"C:\Users\caleb\deception-nanochat-sae-research\experiments"
-          r"\v3_behavioral_sampling\results\v3_layer12_activations.pt")
+# same-prompt honest-vs-deceptive behavioral split (model's own choice, judge-labeled).
+# Activations are produced by the NLA-training repo and kept separate from this harness.
+_DATA_ROOT = Path(os.environ.get("NLA_DATA_ROOT", "path/to/nla-training-repo"))
+PT = _DATA_ROOT / "experiments/v3_behavioral_sampling/results/v3_layer12_activations.pt"
 OUT = NLATTACK / "results" / "deception"
 
 
@@ -35,7 +36,7 @@ def main():
           f"shuffle-null={r.null:.3f} signal={r.signal}")
     OUT.mkdir(parents=True, exist_ok=True)
     rec = {**r.flat(),
-           "source": "deception-nanochat-sae-research v3_layer12_activations.pt (nanochat-d32, L12)",
+           "source": "NLA-training repo: v3_behavioral_sampling/v3_layer12_activations.pt (nanochat-d32, L12)",
            "integrity": "same-prompt behavioral split, model's own choice, judge-labeled (PRIMARY, not control)",
            "note": "bottleneck side; verbalizer side (deception_discrimination) needs an AV"}
     (OUT / "deception_probe_nanochat_d32_L12.json").write_text(json.dumps(rec, indent=2, default=str))

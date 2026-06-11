@@ -10,8 +10,8 @@ therefore confounded by whether C lives in the bottleneck's *encodable subspace*
 which is set by training distribution, not by C alone. Every plan here either
 (a) formalizes that gap, or (b) tests whether a dropout/survival law measured in
 one distribution generalizes to another. Probe-side plans are CPU-only (cached
-L23 `activation_vector` + sklearn) and run while the GPU is busy. Corpora live at
-`deception-nanochat-sae-research/experiments/v8_nla_local/data/stage0/`
+L23 `activation_vector` + sklearn) and run while the GPU is busy. Corpora live in
+the companion NLA-training repo at `<NLA_DATA_ROOT>/experiments/v8_nla_local/data/stage0/`
 (read-only): `gemma4_deception_chunk1`, `arxiv_chunk1`, `cnn_dailymail_chunk1`,
 `fineweb_edu_chunk1`, `wikipedia_chunk1`, `mmlu_moral_chunk1`, `cai_harmless_chunk1`,
 `pku_saferlhf_chunk1`, `anthropic_discrim_explicit_chunk1`,

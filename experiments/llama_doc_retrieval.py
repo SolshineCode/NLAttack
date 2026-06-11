@@ -7,12 +7,12 @@ Method note (honest): Gemma-4 verbalized a single doc-level activation; here the
 Neuronpedia AV verbalizes up to 16 token positions of the doc (concatenated) — the
 hosted API's nature. Same docs, same distractor count, same embedder otherwise.
 
-Run with the deception venv (has sentence-transformers + pyarrow):
-  cd C:/Users/caleb/deception-nanochat-sae-research
-  .venv-gemma4/Scripts/python.exe C:/Users/caleb/nla-eval-harness/experiments/llama_doc_retrieval.py
+The eval parquet lives in your separate NLA-training checkout. Point NLA_DATA_ROOT
+at it (or pass --parquet), then run with a venv that has sentence-transformers + pyarrow:
+  NLA_DATA_ROOT=/path/to/nla-training-repo python experiments/llama_doc_retrieval.py
 """
 from __future__ import annotations
-import sys, json
+import os, sys, json
 from pathlib import Path
 
 NLATTACK = Path(__file__).resolve().parents[1]
@@ -20,8 +20,9 @@ sys.path.insert(0, str(NLATTACK))
 from nla_eval import NeuronpediaNLA
 from nla_eval.verbalizer_axes import _char_ngram_vec
 
-PARQUET = Path(r"C:\Users\caleb\deception-nanochat-sae-research\experiments"
-               r"\v8_nla_local\data\stage3_v0_4_fineweb\indomain_eval_cmp.parquet")
+# The eval docs are produced by the NLA-training repo, kept separate from this harness.
+_DATA_ROOT = Path(os.environ.get("NLA_DATA_ROOT", "path/to/nla-training-repo"))
+PARQUET = _DATA_ROOT / "experiments/v8_nla_local/data/stage3_v0_4_fineweb/indomain_eval_cmp.parquet"
 OUT = NLATTACK / "results" / "cross_nla"
 N_DOCS = 40           # cap to stay well under the 120 req/hr rate limit
 K_DISTRACTORS = 12    # -> chance 1/(12+1) = 0.077, matching Gemma-4's eval
