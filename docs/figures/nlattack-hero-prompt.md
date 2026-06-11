@@ -4,7 +4,7 @@ Create a professional, publication-ready INFOGRAPHIC. Render ALL text crisply an
 - Type: Infographic (hero banner for an open-source ML benchmark README)
 - Layout: bento-grid (modular cells of varied sizes; one wide hero cell on top, supporting cells below)
 - Style: technical-schematic, BLUEPRINT variant — clean engineering blueprint look
-- Aspect ratio: 2.35:1 (cinematic ultra-wide banner)
+- Aspect ratio: 1:1 square (kept output; the model rendered square and the six panels read better square than ultra-wide)
 - Language: English
 
 ## Visual style (technical-schematic / blueprint, DARK)

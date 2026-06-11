@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/figures/nlattack-hero.png" alt="NLAttack overview: what a Natural Language Autoencoder is (activation, AV verbalizer, plain-language text bottleneck, AR reconstructor), the two questions it answers (capability and safety), the two access tiers, the headline finding, and how to get started." width="760">
+  <img src="docs/figures/nlattack-hero.png" alt="NLAttack overview: what a Natural Language Autoencoder is (activation, AV verbalizer, plain-language text bottleneck, AR reconstructor), the two questions it answers (capability and safety), the two access tiers, the headline finding, and how to get started." width="560">
 </p>
 
 # NLAttack
@@ -13,8 +13,8 @@ NLAttack measures how well a Natural Language Autoencoder turns a model's intern
 activations into human-readable text, and whether that text is good enough to use as
 a safety monitor for real-world LLM misuse. It is built to work on weak, small, or
 early-training NLAs, scores both the bottleneck and the verbalizer with explicit
-null controls, and ships a 118-plan catalog, ready-made adapters for hosted and
-local NLAs, and committed result artifacts.
+null controls, and ships a catalog of 118 evaluations, ready-made adapters for
+hosted and local NLAs, and committed result artifacts.
 
 A **Natural Language Autoencoder** explains a model's internal state in plain
 language. An activation verbalizer (AV) reads a hidden activation and writes a
