@@ -133,8 +133,9 @@ def main():
         print(f"  {k:18s} {v if isinstance(v, str) else round(v, 3) if v == v else 'nan'}")
 
     label = metrics["nla_label"].replace("/", "_")
-    (OUT / f"{label}.json").write_text(json.dumps(
-        {k: v for k, v in metrics.items() if k != "examples"}, indent=2, default=str))
+    clean = {k: (None if isinstance(v, float) and v != v else v)
+             for k, v in metrics.items() if k != "examples"}  # NaN -> null (valid JSON)
+    (OUT / f"{label}.json").write_text(json.dumps(clean, indent=2, default=str))
     res.to_csv(str(OUT / f"{label}_rows.csv"))
     (OUT / f"{label}_verbalizations.json").write_text(
         json.dumps(verb, indent=2, default=str))
