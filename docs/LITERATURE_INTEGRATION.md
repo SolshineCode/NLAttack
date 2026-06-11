@@ -1,4 +1,3 @@
-<!-- Authored autonomously by Hermes Agent (Nous nemotron-3-ultra) from docs/LITERATURE.md; materialized + reviewed by Claude. 2026-06-05. -->
 
 # Literature Integration: Concrete Harness Implications
 

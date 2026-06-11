@@ -1,7 +1,7 @@
 """Interpretability-capability measurement for weak/tiny NLAs — with a
 longitudinal EMERGENCE criterion on top.
 
-DESIGN NOTE (revised after expert critique, Hermes nemotron-3-ultra 2026-06-05,
+DESIGN NOTE (revised after an independent expert critique, 2026-06-05,
 and grounded in the probing/emergence literature — see
 `docs/LITERATURE.md`):
 

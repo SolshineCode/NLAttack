@@ -1,6 +1,6 @@
 """Frequency + token-length matched controls.
 
-Hermes review (P1#1): rare concepts drop more — is a low retention score
+independent review (P1#1): rare concepts drop more — is a low retention score
 risk-sensitivity, or just rarity? Every test that compares a concept class to a
 baseline needs controls matched on BOTH frequency band and token length, not just
 tests 1/3/14. This module builds neutral control concepts whose (freq_band, len)

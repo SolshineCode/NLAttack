@@ -204,7 +204,7 @@ class EnsembleMatch:
 
 class EnsembleMatcher:
     """Run several matcher topologies and require >threshold agreement before
-    calling a concept present. Directly addresses the Hermes P0 'matcher topology
+    calling a concept present. Directly addresses the independent-review P0 'matcher topology
     = NLA topology' confound: an effect that only one topology sees is suspect.
 
     Default backends are all dependency-free (lexical, fuzzy, overlap). Pass

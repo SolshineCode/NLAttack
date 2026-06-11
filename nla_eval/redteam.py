@@ -1,4 +1,4 @@
-"""Adaptive red-team evaluation (Hermes review P0 #3).
+"""Adaptive red-team evaluation (independent review P0 #3).
 
 Static i.i.d. tests miss the real threat model for an NLA-as-monitor: an
 *adaptive* attacker who probes the monitor and optimizes inputs to keep malicious

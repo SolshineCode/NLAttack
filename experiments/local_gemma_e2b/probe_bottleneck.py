@@ -1,4 +1,4 @@
-"""Bottleneck-probe experiment on the local Gemma-4-E2B NLA (Hermes P0 #1).
+"""Bottleneck-probe experiment on the local Gemma-4-E2B NLA (review note P0 #1).
 
 Reads the deception corpus parquet READ-ONLY (activation_vector @ L23 =
 the NLA bottleneck; detokenized_text_truncated = ground-truth source) and asks,
@@ -95,7 +95,7 @@ def main():
     print(f"wrote {out}")
     print("\nNEXT (GPU, deferred): run AV verbalization on the same rows, compute "
           "av_matcher_acc per concept, then probe_acc - av_matcher_acc = the "
-          "verbalizer+matcher loss Hermes asked us to subtract.")
+          "verbalizer+matcher loss the review asked us to subtract.")
 
 
 if __name__ == "__main__":

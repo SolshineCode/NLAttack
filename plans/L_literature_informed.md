@@ -1,6 +1,5 @@
 # Family L — Literature-informed evaluations
 
-<!-- Plans P107-P112 authored autonomously by Hermes Agent (Nous nemotron-3-ultra) from docs/LITERATURE.md; materialized + reviewed by Claude. 2026-06-05. -->
 
 # Family L — Literature-informed evaluations
 

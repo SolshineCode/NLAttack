@@ -1,12 +1,13 @@
 __pycache__/
 *.pyc
 
-# operational scratch (Hermes dispatch, OAuth device-flow logs — contain codes)
+# operational scratch (dispatch helpers, OAuth device-flow logs that contain codes)
 authlog*.txt
 nous_login.py
 *_hermes*.sh
 wait_hermes.sh
 hermes_review_prompt.md
+*.log
 .venv/
 venv/
 .env

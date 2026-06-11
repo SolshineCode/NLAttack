@@ -1,8 +1,7 @@
 # Consolidated review — evaluating rudimentary NLAs
 
-Synthesis of the Hermes (`nemotron-3-ultra`) and Antigravity (`gemini-3.5-flash`)
-critiques of all 100 plans, focused on **smaller/weaker NLAs** than the plans
-assume. Full per-plan detail in `hermes/` and `antigravity/`.
+Synthesis of two independent reviewers' critiques of all 100 plans, focused on **smaller/weaker NLAs** than the plans
+assume. Full per-plan detail in `reviewer-a/` and `reviewer-b/`.
 
 ## Convergent guidance (both reviewers, repeatedly)
 
@@ -37,8 +36,8 @@ assume. Full per-plan detail in `hermes/` and `antigravity/`.
 | **P092 / P095** abstention vs confabulation; hedge-vs-faithfulness | evaluable via simple entropy/length/repetition proxies, no deep probing |
 | **P067** ordering/dilution (probe-only grid) | tests position/compression invariance in activation space; no adaptive search needed |
 
-(Near-misses each reviewer ranked highly: Hermes also P100, P073, P080, P089, P086;
-agy also P009, P044, P057, P060, P084, P032.)
+(Near-misses each reviewer ranked highly: reviewer A also P100, P073, P080, P089, P086;
+reviewer B also P009, P044, P057, P060, P084, P032.)
 
 ## SKIP until the NLA is stronger — both reviewers' "skip" overlap
 
@@ -54,16 +53,16 @@ generative AV is expected-null on a rudimentary NLA.
 
 ## Where the reviewers DISAGREE (decide per your NLA)
 
-- **P089 (layer × distribution):** Hermes ranks it **highest-value** (pure probe
-  on existing multi-layer dumps); agy says **skip** (high-variance AUC on tiny
+- **P089 (layer × distribution):** reviewer A ranks it **highest-value** (pure probe
+  on existing multi-layer dumps); reviewer B says **skip** (high-variance AUC on tiny
   models won't converge). → Run it *only* if you have several layers dumped and
   enough n; otherwise defer.
-- **Family F (matcher/verbalizer confound) wholesale:** Hermes says **none of
+- **Family F (matcher/verbalizer confound) wholesale:** reviewer A says **none of
   P051–P055 as written** survive a degenerate AV and would **replace the whole
-  family** with probe-only matcher-noise-floor ablations on fixed human text; agy
+  family** with probe-only matcher-noise-floor ablations on fixed human text; reviewer B
   keeps **P051/P057/P060** as usable baselines. → On a truly rudimentary AV,
-  follow Hermes (characterize the matcher on human text, not on AV output).
-- **Family D top picks:** agy skips P033/P036 and elevates P032/P040/P031; Hermes
+  follow reviewer A (characterize the matcher on human text, not on AV output).
+- **Family D top picks:** reviewer B skips P033/P036 and elevates P032/P040/P031; reviewer A
   skips P031/P032 (matcher hallucination on generic text) and elevates P034/P037
   (minimal-pair + probe ground truth). → The probe-grounded ones (P034, P037,
   P040) are the safer bets; pure coverage/obfuscation heatmaps are noise-prone.

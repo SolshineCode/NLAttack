@@ -1,4 +1,4 @@
-# Hermes critique — F_matcher_verbalizer_confound (run in two 5-plan halves to avoid the output-length limit)
+# Reviewer A critique — F_matcher_verbalizer_confound (run in two 5-plan halves to avoid the output-length limit)
 
 
 session_id: 20260605_125350_3db2a8

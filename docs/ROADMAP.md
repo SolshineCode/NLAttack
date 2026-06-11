@@ -1,4 +1,4 @@
-# NLAttack roadmap — from two Hermes reviews (2026-06-08)
+# NLAttack roadmap — from two independent reviews (2026-06-08)
 
 Synthesis of a targeted review (verbalizer-axes critique) + an open-ended,
 web-grounded review (read the Anthropic/transformer-circuits/Neuronpedia NLA

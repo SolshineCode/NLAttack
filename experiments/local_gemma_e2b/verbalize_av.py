@@ -1,6 +1,6 @@
 """AV-side of the bottleneck disentanglement (GPU; run when the 4GB card is free).
 
-Completes Hermes P0 #1: for the same rows the bottleneck probe used, run the AV
+Completes review note P0 #1: for the same rows the bottleneck probe used, run the AV
 verbalizer on each activation, score whether the matcher finds each concept in
 the verbalization (av_matcher_acc), then:
 

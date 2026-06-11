@@ -1,9 +1,8 @@
 # NLAttack — Design Review & Validity Threats
 
 Peer review of the 20-test harness + the "weak lossy concept filter" hypothesis.
-Source: skeptical review by Hermes Agent (`nemotron-3-ultra:free`, Nous Portal,
-session `20260604_161851_f72fb6`, 2026-06-04), synthesized with the harness
-author's notes. This file is the standing issue list — work items reference it.
+Source: an independent skeptical peer review (2026-06-04), synthesized with the
+harness author's notes. This file is the standing issue list — work items reference it.
 
 The headline: **the suite is well-built for *describing AV-description phenomena*;
 it becomes a valid *NLA characterization* only once the verbalizer/matcher

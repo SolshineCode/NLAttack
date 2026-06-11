@@ -2,7 +2,7 @@
 
 A catalog of 100 evaluation plans for Natural Language Autoencoders, built on the
 NLAttack thesis (a weak NLA is a **lossy concept filter**; the floor primitive is
-*did concept C survive the bottleneck?*) and hardened by the Hermes design review
+*did concept C survive the bottleneck?*) and hardened by the independent design review
 (`../DESIGN_REVIEW.md`): the AV verbalizer + matcher are extra lossy filters, so
 every plan states how it handles that confound.
 
@@ -18,7 +18,7 @@ Each plan is falsifiable, weak-NLA-aware, and maps to the harness (`nla_eval/`).
 - **Method:** <dataset + NLA call pattern + what is measured>
 - **Metric:** <the number(s) reported>
 - **Feasibility:** high | medium | frontier — <why, on genuinely weak NLAs>
-- **Controls:** <Hermes confounds addressed: probe ground-truth / matcher
+- **Controls:** <review confounds addressed: probe ground-truth / matcher
   ensemble / freq+length / faithfulness weighting / below-floor calibration>
 - **Deception link:** <knowledge-asymmetry / misuse-detection relevance>
 - **Harness:** <existing module or test, or new code needed>

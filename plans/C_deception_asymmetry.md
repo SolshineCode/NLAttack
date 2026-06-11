@@ -6,7 +6,7 @@ survive the bottleneck?) is necessary but not sufficient here — deception live
 *epistemic structure*: who knows what, what claim-status a proposition carries,
 whether a belief is true, hedged, attributed, or concealed. Those are not single
 content words; they are relations the AV verbalizer can flatten while every
-component noun survives. So this family leans hard on the Hermes P0 fix:
+component noun survives. So this family leans hard on the independent-review P0 fix:
 **probe the bottleneck activation for the epistemic relation directly** rather than
 trusting the AV text, and report the probe−AV gap so a flattened relation isn't
 mistaken for an NLA dropout. Many epistemic-structure probes are genuinely
