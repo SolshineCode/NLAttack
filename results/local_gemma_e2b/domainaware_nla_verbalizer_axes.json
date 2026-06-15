@@ -1,0 +1,13 @@
+{
+  "model": "google/gemma-4-E2B",
+  "nla_variant": "domain-aware contrastive (InfoNCE over hard-negative activations) NLA, rank-8 LoRA",
+  "injection": "residual L23 last-token activation injected at the concept token, L2-normalized to sqrt(1536)",
+  "eval": "de-circularized held-out set, 5 academic domains (sciq/PubMedQA/hendrycks_math/lex_glue/imdb)",
+  "verbalizer_axes": {
+    "minimal_pair_discrimination": {"raw": 0.491, "null": 0.505, "margin": -0.014, "n": 40, "chance": 0.5},
+    "doc_retrieval": {"raw": 0.050, "null": 0.017, "margin": 0.033, "n": 60},
+    "prior_deviation": {"raw": 0.037, "null": 0.000, "margin": 0.037, "n": 60}
+  },
+  "baseline_v0_1_minimal_pair": 0.531,
+  "note": "Domain-aware contrastive training improves LIKELIHOOD-based domain discrimination but the GENERATION-based minimal-pair AUC stays at chance (~0.49, marginally below the v0.1 baseline ~0.531). I.e. the verbalizer routes domain but its generations do not carry distinguishing within-domain content. Reported as an honest negative on the generation axes."
+}
