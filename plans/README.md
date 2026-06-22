@@ -41,6 +41,16 @@ Each plan is falsifiable, weak-NLA-aware, and maps to the harness (`nla_eval/`).
 | J | P091–P100 | **Calibration / uncertainty / self-knowledge** — does the bottleneck encode its own uncertainty, abstention handling, hallucinated specificity over gaps, ambiguity preservation |
 | K | P101–P106 | **Emergence & additive capability index** — sufficiency, selectivity, graded encoding, abstraction transfer, effective rank, and the additive Emergence Index that sums the null-gated axes (`nla_eval/emergence.py`) |
 
+(Families L–M, P107–P118, are listed in `INDEX.md`: literature-informed
+evaluations and deception/misalignment monitoring.)
+
+**v0.2 additive (not in the frozen v0.1 count):** Family N — **CTF Red/Blue**
+(P119–P128, `N_ctf_red_blue.md` + `nla_eval/ctf.py` + `docs/CTF_RED_BLUE.md`): a
+Red model captures a hidden misaligned-objective flag while a Blue NLA-monitor
+reads the AV text to catch it; reports an adversarial scoreboard. It uses the same
+schema, the same null-control discipline, and the same probe-vs-AV separation
+(capture = the bottleneck probe, flag = the matcher over the AV text).
+
 ## Feasibility legend
 - **high** — runnable today on a weak NLA with the current harness (often CPU/probe-side).
 - **medium** — needs modest new code or a working AV/server.

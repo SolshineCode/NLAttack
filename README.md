@@ -107,6 +107,11 @@ evaluate your own local NLA, implement the one-method `NLA` adapter (see
   emergence) that need raw activations. Query it in code via `nla_eval.access`.
 - **Deception / misalignment monitoring** (Family M): can the NLA's text be read to
   catch a model's own deceptive behavior?
+- **CTF Red/Blue exercises** (Family N, *v0.2 additive*): a Red model captures a
+  hidden misaligned-objective flag while a Blue NLA-monitor reads the AV text to
+  catch it — reported as an adversarial scoreboard (clean-capture rate vs catch
+  rate). See [docs/CTF_RED_BLUE.md](docs/CTF_RED_BLUE.md); offline demo
+  `python experiments/ctf_red_blue_demo.py`.
 - **Two principles throughout:** floor-first (one reliable per-concept primitive,
   so weak NLAs still yield signal) and null controls on everything (a result counts
   only when it clears a permutation floor).

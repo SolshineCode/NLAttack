@@ -107,6 +107,28 @@ A/B/C/D produce a publishable conditioning result first.
 
 ---
 
+## 4b. Family N — CTF Red/Blue (new, additive)
+
+A game-theoretic packaging of Families G + M into a Red-vs-Blue Capture-the-Flag,
+so an NLA-monitor can be reported as an adversarial scoreboard (clean-capture rate,
+catch rate, stealth gap, evasion cost). Additive: it touches no v0.1 content.
+
+Status:
+- [x] Harness module `nla_eval/ctf.py` (Flag/catalog, BlueMonitor, capture oracles,
+      naive + adaptive Red policies, `play_ctf`, `CTFScore`) — reuses
+      `redteam.adaptive_evade` and `deception.DECEPTION_ANCHORS`.
+- [x] Plan catalog `plans/N_ctf_red_blue.md` (P119–P128) + design `docs/CTF_RED_BLUE.md`.
+- [x] Control-tier offline demo `experiments/ctf_red_blue_demo.py` (MockNLA, CPU) +
+      committed artifact `results/ctf/ctf_red_blue_mock.json`.
+- [ ] **Primary-tier run** — swap the survival-proxy oracle for a real
+      bottleneck-probe oracle (`ctf.probe_capture_oracle`) over the local NLA's own
+      honest-vs-deceptive behavior (gated on work item E: local Gemma-4-E2B + GPU).
+- [ ] Escalation ladder (P123) and category catalog expansion (P124) for power.
+- [ ] Cross-monitor transfer runner (P127) once ≥2 probe+AV pipelines exist.
+
+Gate: like Family M, only a primary-tier (probe oracle over model-own behavior)
+result may be reported as a headline; control-tier runs are mechanics demos (P128).
+
 ## 5. Out of scope for v0.2
 
 - Causal-fidelity (AR loop) — still P0 on the roadmap, still GPU-gated

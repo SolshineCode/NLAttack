@@ -31,6 +31,7 @@ metric, feasibility, controls, and a "null looks like" line). The full table is 
 | K | P101–P106 | Emergence and the additive capability index |
 | L | P107–P112 | Literature-informed evaluations (simulatability, steerability, etc.) |
 | M | P113–P118 | Deception / misalignment monitoring |
+| N | P119–P128 | **CTF Red/Blue** (deception capture-the-flag) — *v0.2 additive* |
 
 For evaluating weak or tiny NLAs, [`plans/RUDIMENTARY_TIERS.md`](../plans/RUDIMENTARY_TIERS.md)
 sorts the plans into run-first, floor-version, and skip-until-stronger tiers.
@@ -51,6 +52,7 @@ sorts the plans into run-first, floor-version, and skip-until-stronger tiers.
 | `rudimentary.py` | floor checks (does a bottleneck exist, and is the AR/AV input-conditioned) |
 | `controls.py` | frequency-and-length-matched controls |
 | `redteam.py` | adaptive evasion and compositional blind-spot search |
+| `ctf.py` | CTF Red/Blue game loop and scoreboard (Family N, v0.2) — Red captures a hidden misaligned-objective flag, Blue NLA-monitor reads the AV text to catch it |
 | `attack_concepts.py` | ATT&CK technique dictionary for the misuse family |
 | `local_gemma_e2b.py` | adapter for a local Gemma-E2B NLA (full activation access) |
 | `access.py` | the access-tier map (API-runnable vs full-access) and leaderboard-metric list |
@@ -135,4 +137,29 @@ multi-judge consortium. NLAttack wires that substrate into its existing axes:
 behavior under an identical prompt. Instructed deception or role-assignment turns
 the task into prompt classification, so any such run is a control, not a primary
 result. This is enforced in the family's documentation and result metadata.
+
+
+## CTF Red/Blue (Family N, v0.2 additive)
+
+Family N packages Families G (adaptive red-team) and M (deception monitoring) into
+a head-to-head Capture-the-Flag game so an NLA-monitor can be reported as an
+**adversarial leaderboard**: a Red model pursues a hidden misaligned objective (the
+flag — exfiltration, sandbagging, a concealed override, collusion, a backdoor)
+while a Blue NLA-monitor reads the AV verbalization and tries to catch it. Each
+round resolves to one of four outcomes — `clean_capture` (Red wins), `busted`
+(Blue wins), `false_alarm`, `failed` — and `CTFScore` reports the headline rates:
+`clean_capture_rate` (Red), `catch_rate` (Blue's recall on genuine captures),
+`mean_stealth_gap` (the probe−AV exploitable surface), and `mean_queries_to_capture`
+(evasion cost).
+
+The same probe-vs-AV separation as the rest of the suite is enforced: **capture**
+is ground truth on the activation (the bottleneck probe), **flag** is the matcher
+over the AV text — never the same signal (the independent-review P0 #1 fix). The
+**integrity gate** mirrors Family M: a run is *control-tier* when capture uses the
+model-agnostic survival proxy over constructed flags (`ctf.survival_oracle`,
+MockNLA-ready today) and *primary-tier* only with a real bottleneck-probe oracle
+over the model's own behavior (`ctf.probe_capture_oracle`, local NLA + GPU). Every
+`CTFScore` carries its `tier`. Full design: [`CTF_RED_BLUE.md`](CTF_RED_BLUE.md);
+catalog: [`../plans/N_ctf_red_blue.md`](../plans/N_ctf_red_blue.md); offline demo:
+`python experiments/ctf_red_blue_demo.py`.
 
