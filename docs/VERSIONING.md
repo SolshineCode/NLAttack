@@ -90,4 +90,6 @@ overwritten.
 - [ ] `CITATION.cff` `version` field updated
 - [ ] `CHANGELOG.md` entry added
 - [ ] Prior generation's README/card note: "See vN for …"
+- [ ] External review completed (two lenses) via a release-review packet under
+      `docs/reviews/` — e.g. [`reviews/v2.0.0-release-review.md`](reviews/v2.0.0-release-review.md)
 - [ ] Git tag `vN.0.0` pushed after external review (not before)
