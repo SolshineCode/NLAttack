@@ -1,15 +1,17 @@
-# NLAttack v0.2 roadmap (LOCAL DRAFT — not yet pushed)
+# NLAttack v2 development roadmap
 
-v0.2.0 is the first minor version after v0.1. Primary goals: expanded domain
-coverage, harness correctness fixes, and cleaner multi-version result management.
-Content scope is additive — v0.1 benchmark content is untouched.
+**Shipped in v2.0.0:** the CTF Red/Blue family (Family N) and release/versioning
+maturation — see [CHANGELOG.md](../CHANGELOG.md). This file tracks the remaining v2
+engineering: expanded domain coverage, harness-correctness fixes, and multi-version
+result management. All of it is **additive** — v1 benchmark content is untouched —
+and none of it is claimed in the tagged v2.0.0 results until it is run and reviewed.
 
 ---
 
 ## 1. Harness fixes (from ultrareview 2026-06-12, confirmed ×2-of-3 Opus lenses)
 
-These fix code bugs, not benchmark design. All required before any new results
-under the v0.2 label.
+These fix code bugs, not benchmark design. Required before any new *content* results
+(domain expansion below) are published under v2.
 
 | # | File | Issue | Fix |
 |---|---|---|---|
@@ -30,11 +32,11 @@ under the v0.2 label.
 
 ## 2. Expanded domain coverage
 
-v0.1 evaluates on the original concept/document set (primarily deception domain).
-v0.2 adds multi-domain coverage using the same NLAs, so the eval speaks to
+v1 evaluates on the original concept/document set (primarily deception domain).
+v2 adds multi-domain coverage using the same NLAs, so the eval speaks to
 generalization rather than domain specialization.
 
-### 2a. Target domains for v0.2
+### 2a. Target domains
 Drawn from the ARM A balanced corpus (academically-sourced, cluster-level holdout):
 
 | Domain | Source | Status |
@@ -49,30 +51,25 @@ Drawn from the ARM A balanced corpus (academically-sourced, cluster-level holdou
 | news | CC-News / RealNews | available |
 | persuasion | Persuasion for Good | available |
 | global_opinions | GlobalOpinionQA | available |
-| deception | (v0.1 original) | existing |
+| deception | (v1 original) | existing |
 
-Domains intentionally excluded from v0.2 expansion (data provenance issues or
+Domains intentionally excluded from this expansion (data provenance issues or
 insufficient academic sourcing): fineweb raw, news_rl, pku_safety, mmlu_moral.
-These remain under review for v0.3.
+These remain under review for a later generation.
 
 ### 2b. Concept/document set construction
-- Per-domain concept set: 8 concepts minimum (the v0.1 reliability floor)
+- Per-domain concept set: 8 concepts minimum (the v1 reliability floor)
 - Document pool: 10–20 documents per domain, held out from any AV training data
-- Concept–document pairing: same methodology as v0.1 (canonical NLA concept list
+- Concept–document pairing: same methodology as v1 (canonical NLA concept list
   for the tested NLA source, paired with source documents from each new domain)
-- Concept survival threshold: unchanged from v0.1 (preserves backward comparability
+- Concept survival threshold: unchanged from v1 (preserves backward comparability
   of the threshold, not the concept set)
 
-### 2c. Result directory structure
-```
-results/
-  v0.1/          ← v0.1 results untouched here
-    emergence_gemma4_deception_chunk1.json
-    ...
-  v0.2/          ← all new results under this prefix
-    emergence_v0.2_gemma4_multidomain.json
-    ...
-```
+### 2c. Result directory convention
+v1 artifacts stay in their existing `results/` subdirectories (never overwritten);
+new multi-domain results are added alongside them with a `v2`/multidomain marker in
+the filename, and every artifact's generation is recorded in `results/README.md`
+(provenance map). Example new file: `results/local_gemma_e2b/v2_gemma4_multidomain.json`.
 
 ---
 
@@ -80,29 +77,29 @@ results/
 
 ```python
 # nla_eval/__init__.py
-__version__ = "0.2.0.dev"
+__version__ = "2.0.0"
 ```
 
 New domain sets live under a `BENCHMARK_VERSION` config key so a single codebase
-can run either version:
+can run either generation:
 ```python
 # nla_eval/datasets/registry.py  (new file)
 VERSIONS = {
-    "v0.1": {"domains": ["deception"], "min_concepts": 8},
-    "v0.2": {"domains": [...], "min_concepts": 8},
+    "v1": {"domains": ["deception"], "min_concepts": 8},
+    "v2": {"domains": [...], "min_concepts": 8},
 }
 ```
 
 ---
 
-## 4. NLA sources (unchanged from v0.1 for now)
+## 4. NLA sources (unchanged from v1 for now)
 
 - `gemma-3-27b-it / kitft-l41` (Neuronpedia)
 - `llama3.3-70b-it / kitft-l53` (Neuronpedia)
 
 Adding new NLA sources (e.g., Gemma-4-E2B fine-tuned AVs from the deception
 research program) is gated on: (a) the AV checkpoint being stable/published, and
-(b) external review of the conditioning results. Not in v0.2 scope unless ARM
+(b) external review of the conditioning results. Not in v2.0.0 scope unless ARM
 A/B/C/D produce a publishable conditioning result first.
 
 ---
@@ -111,7 +108,8 @@ A/B/C/D produce a publishable conditioning result first.
 
 A game-theoretic packaging of Families G + M into a Red-vs-Blue Capture-the-Flag,
 so an NLA-monitor can be reported as an adversarial scoreboard (clean-capture rate,
-catch rate, stealth gap, evasion cost). Additive: it touches no v0.1 content.
+catch rate, stealth gap, evasion cost). Additive: it touches no v1 content.
+**Shipped in v2.0.0.**
 
 Status:
 - [x] Harness module `nla_eval/ctf.py` (Flag/catalog, BlueMonitor, capture oracles,
@@ -129,21 +127,23 @@ Status:
 Gate: like Family M, only a primary-tier (probe oracle over model-own behavior)
 result may be reported as a headline; control-tier runs are mechanics demos (P128).
 
-## 5. Out of scope for v0.2
+## 5. Out of scope for v2
 
 - Causal-fidelity (AR loop) — still P0 on the roadmap, still GPU-gated
 - Human utility evals — still P1, still infra-gated
-- Changing tier thresholds or the EmergenceIndex formula — would break v0.1
-  backward comparability; reserved for v1.0 if justified
+- Changing tier thresholds or the EmergenceIndex formula — would break v1
+  backward comparability; reserved for a future generation if justified
 
 ---
 
-## 6. Rollout gate
+## 6. Rollout gate for the v2 multi-domain content
 
-Per `VERSIONING.md`: branch `v0.2-dev` stays **local only** until:
+The CTF family (Family N) and release maturation already shipped in **v2.0.0**. The
+**multi-domain content** above stays out of any published v2 result table until:
 - [ ] All H1–H12 harness fixes implemented and tested
 - [ ] New domain concept/document sets constructed and reviewed
-- [ ] At least one full eval run on a known NLA source produces a v0.2 result
+- [ ] At least one full eval run on a known NLA source produces a multi-domain result
 - [ ] External review requested (Gemini + manual)
-- [ ] Version constant set to `0.2.0` (drop `.dev`)
-- [ ] Git tag `v0.2.0` pushed to remote
+- [ ] Result artifacts added alongside v1 (never overwriting) + provenance recorded
+      in `results/README.md`
+- [ ] `CHANGELOG.md` updated and a `v2.x` tag pushed after review

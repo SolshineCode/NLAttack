@@ -10,11 +10,13 @@ see [RESULTS.md](RESULTS.md).
 The suite has two layers: a **plan catalog** (the design space) and an
 **implemented harness** (runnable code).
 
-### Plan catalog: 118 plans, 13 families
+### Plan catalog: 128 plans, 14 families
 
 Each plan is a falsifiable evaluation with a fixed schema (hypothesis, method,
-metric, feasibility, controls, and a "null looks like" line). The full table is in
-[`plans/INDEX.md`](../plans/INDEX.md); the schema is in [`plans/README.md`](../plans/README.md).
+metric, feasibility, controls, and a "null looks like" line). Families A–M
+(P001–P118) are the frozen v1 catalog; Family N (P119–P128) is new in v2. The full
+table is in [`plans/INDEX.md`](../plans/INDEX.md); the schema is in
+[`plans/README.md`](../plans/README.md).
 
 | Family | Plans | Theme |
 |---|---|---|
@@ -31,7 +33,7 @@ metric, feasibility, controls, and a "null looks like" line). The full table is 
 | K | P101–P106 | Emergence and the additive capability index |
 | L | P107–P112 | Literature-informed evaluations (simulatability, steerability, etc.) |
 | M | P113–P118 | Deception / misalignment monitoring |
-| N | P119–P128 | **CTF Red/Blue** (deception capture-the-flag) — *v0.2 additive* |
+| N | P119–P128 | **CTF Red/Blue** (deception capture-the-flag) — *new in v2* |
 
 For evaluating weak or tiny NLAs, [`plans/RUDIMENTARY_TIERS.md`](../plans/RUDIMENTARY_TIERS.md)
 sorts the plans into run-first, floor-version, and skip-until-stronger tiers.
@@ -52,7 +54,7 @@ sorts the plans into run-first, floor-version, and skip-until-stronger tiers.
 | `rudimentary.py` | floor checks (does a bottleneck exist, and is the AR/AV input-conditioned) |
 | `controls.py` | frequency-and-length-matched controls |
 | `redteam.py` | adaptive evasion and compositional blind-spot search |
-| `ctf.py` | CTF Red/Blue game loop and scoreboard (Family N, v0.2) — Red captures a hidden misaligned-objective flag, Blue NLA-monitor reads the AV text to catch it |
+| `ctf.py` | CTF Red/Blue game loop and scoreboard (Family N, v2) — Red captures a hidden misaligned-objective flag, Blue NLA-monitor reads the AV text to catch it |
 | `attack_concepts.py` | ATT&CK technique dictionary for the misuse family |
 | `local_gemma_e2b.py` | adapter for a local Gemma-E2B NLA (full activation access) |
 | `access.py` | the access-tier map (API-runnable vs full-access) and leaderboard-metric list |
@@ -139,7 +141,7 @@ the task into prompt classification, so any such run is a control, not a primary
 result. This is enforced in the family's documentation and result metadata.
 
 
-## CTF Red/Blue (Family N, v0.2 additive)
+## CTF Red/Blue (Family N, new in v2)
 
 Family N packages Families G (adaptive red-team) and M (deception monitoring) into
 a head-to-head Capture-the-Flag game so an NLA-monitor can be reported as an

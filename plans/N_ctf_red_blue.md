@@ -1,7 +1,8 @@
 # Family N — CTF Red/Blue (deception capture-the-flag)
 
-**v0.2 additive — not part of the frozen v0.1 catalog (P001–P118).** See
-`../docs/ROADMAP_v0.2.md` and `../docs/CTF_RED_BLUE.md`.
+**New in v2.** Families A–M (P001–P118) are the frozen v1 catalog; this family is
+additive and changes none of it. See `../docs/CTF_RED_BLUE.md` and
+`../docs/ROADMAP_v2.md`.
 
 A game-theoretic packaging of the two halves of the NLA-as-monitor threat model
 that Families G (adaptive red-team) and M (deception monitoring) already measure

@@ -1,11 +1,13 @@
-# NLA Evaluation Plans — Master Index (P001–P118)
+# NLA Evaluation Plans — Master Index (P001–P128)
 
-118 plans across 13 families. Schema/themes: `README.md`. Feasibility: high/medium/frontier.
+**128 plans across 14 families (v2).** Families A–M (P001–P118) are the frozen v1
+catalog; Family N (P119–P128) is new in v2. Schema/themes: `README.md`.
+Feasibility: high/medium/frontier.
 
-**Feasibility mix:** high=44 · medium=58 · frontier=15 · mixed=1
+**Feasibility mix (A–M):** high=44 · medium=58 · frontier=15 · mixed=1
 
-> v0.2 additive (not in the frozen v0.1 count): **Family N — CTF Red/Blue**
-> (P119–P128, `N_ctf_red_blue.md` + `nla_eval/ctf.py`). See bottom of this file.
+> New in v2: **Family N — CTF Red/Blue** (P119–P128, `N_ctf_red_blue.md` +
+> `nla_eval/ctf.py` + `docs/CTF_RED_BLUE.md`). Listed at the bottom of this file.
 
 > Small/weak NLA? `RUDIMENTARY_TIERS.md`. Emergence: Family K + `nla_eval/emergence.py`.
 > AV-conditioning (track training): `nla_eval/verbalizer_axes.py` + `docs/AV_CONDITIONING_AXES.md`.
@@ -198,7 +200,7 @@
 
 ---
 
-## v0.2 additions (not part of the frozen v0.1 catalog)
+## New in v2 (families A–M above are the frozen v1 catalog)
 
 ## Family N — CTF Red/Blue (deception capture-the-flag)  (`N_ctf_red_blue.md`)
 

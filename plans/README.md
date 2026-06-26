@@ -44,7 +44,7 @@ Each plan is falsifiable, weak-NLA-aware, and maps to the harness (`nla_eval/`).
 (Families L–M, P107–P118, are listed in `INDEX.md`: literature-informed
 evaluations and deception/misalignment monitoring.)
 
-**v0.2 additive (not in the frozen v0.1 count):** Family N — **CTF Red/Blue**
+**New in v2 (families A–M above are the frozen v1 catalog):** Family N — **CTF Red/Blue**
 (P119–P128, `N_ctf_red_blue.md` + `nla_eval/ctf.py` + `docs/CTF_RED_BLUE.md`): a
 Red model captures a hidden misaligned-objective flag while a Blue NLA-monitor
 reads the AV text to catch it; reports an adversarial scoreboard. It uses the same

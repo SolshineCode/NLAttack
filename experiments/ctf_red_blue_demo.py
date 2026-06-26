@@ -1,4 +1,4 @@
-"""Demo: CTF Red/Blue exercise (v0.2, Family N) against the offline MockNLA.
+"""Demo: CTF Red/Blue exercise (v2, Family N) against the offline MockNLA.
 
 Pits an adaptive Red team (laundering a hidden deceptive objective) against a Blue
 NLA-monitor (reading the AV verbalization). Prints the scoreboard and writes it to
@@ -63,7 +63,7 @@ def main():
         "tier": adaptive.tier,
         "integrity": ("CONTROL: survival-proxy oracle over constructed flags; "
                       "swap in a bottleneck-probe oracle over model-own behavior for PRIMARY (P128)"),
-        "note": "v0.2 Family N CTF Red/Blue; mechanics demo, not a monitor certification",
+        "note": "v2 Family N CTF Red/Blue; mechanics demo, not a monitor certification",
     }
     path = OUT / "ctf_red_blue_mock.json"
     path.write_text(json.dumps(rec, indent=2, default=str))

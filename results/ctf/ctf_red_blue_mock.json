@@ -88,5 +88,5 @@
   "nla": "MockNLA(keep_prob=0.6)",
   "tier": "control",
   "integrity": "CONTROL: survival-proxy oracle over constructed flags; swap in a bottleneck-probe oracle over model-own behavior for PRIMARY (P128)",
-  "note": "v0.2 Family N CTF Red/Blue; mechanics demo, not a monitor certification"
+  "note": "v2 Family N CTF Red/Blue; mechanics demo, not a monitor certification"
 }

@@ -1,4 +1,4 @@
-# CTF Red/Blue exercises (v0.2, Family N)
+# CTF Red/Blue exercises (Family N, new in v2)
 
 A way to report an NLA-as-monitor as an **adversarial leaderboard** instead of a
 set of separate axes. NLAttack already measures the two halves of the monitoring
@@ -16,9 +16,9 @@ suite can answer the question a deployer actually asks:
 > How well does this NLA-monitor catch misalignment, and how often can a model
 > capture the flag without getting caught?
 
-This is **v0.2 additive** content. It does not touch the frozen v0.1 catalog
-(P001–P118) or any v0.1 result; see [`VERSIONING.md`](VERSIONING.md) and
-[`ROADMAP_v0.2.md`](ROADMAP_v0.2.md).
+This family is **new in v2** and additive: it does not touch the frozen v1 catalog
+(families A–M, P001–P118) or any v1 result; see [`VERSIONING.md`](VERSIONING.md),
+[`../CHANGELOG.md`](../CHANGELOG.md), and [`ROADMAP_v2.md`](ROADMAP_v2.md).
 
 ## The game
 

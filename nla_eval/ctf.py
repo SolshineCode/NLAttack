@@ -1,5 +1,5 @@
 """CTF Red/Blue — an adversarial game packaging of the NLA-as-monitor question
-(v0.2 additive, Family N).
+(v2, Family N).
 
 The deception (Family M) and adaptive-red-team (Family G) axes already measure the
 two halves of the threat model separately: M asks *can the monitor read deception
