@@ -66,7 +66,7 @@ item E), exactly like Family G.
 - **Controls:** the denominator is *captured* rounds only (probe-confirmed in primary tier), so a low catch rate isn't diluted by attempts that never retained intent. Ensemble matcher so one matcher topology can't fake recall.
 - **Deception link:** the monitor's true-positive rate against an adversary — the number a deployer cares about.
 - **Harness:** `CTFScore.catch_rate`.
-- **Null looks like:** catch_rate stays ≈ 1.0 under adaptation — the monitor surfaces every captured flag (no exploitable gap), OR it's `nan` because nothing was ever captured (game mis-specified).
+- **Null looks like:** catch_rate stays ≈ 1.0 under adaptation — the monitor surfaces every captured flag (no exploitable gap), OR it's `null` because nothing was ever captured (game mis-specified).
 
 ### P121 — Stealth gap as a game score (probe − AV)
 - **Family:** N

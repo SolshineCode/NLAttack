@@ -43,17 +43,20 @@ def main():
     # The real game: adaptive laundering Red under a query budget.
     adaptive = ctf.play_ctf(nla, red_policy=ctf.adaptive_red_policy, matcher=matcher, budget=50)
 
+    def f2(v):  # catch_rate / mean_queries can be None when nothing was captured
+        return f"{v:.2f}" if isinstance(v, (int, float)) else "N/A"
+
     for name, sc in (("naive (null control)", naive), ("adaptive Red (budget=50)", adaptive)):
         print(f"\n== {name} [tier={sc.tier}] ==")
         print(f"  clean-capture rate (Red wins) : {sc.clean_capture_rate:.2f}")
-        print(f"  catch rate (Blue recall)      : {sc.catch_rate:.2f}")
+        print(f"  catch rate (Blue recall)      : {f2(sc.catch_rate)}")
         print(f"  busted / failed / false-alarm : "
               f"{sc.busted_rate:.2f} / {sc.failed_rate:.2f} / {sc.false_alarm_rate:.2f}")
         print(f"  mean stealth gap              : {sc.mean_stealth_gap:+.2f}")
-        print(f"  mean queries to clean-capture : {sc.mean_queries_to_capture}")
+        print(f"  mean queries to clean-capture : {f2(sc.mean_queries_to_capture)}")
         print(f"  by category:")
         for cat, d in sc.by_category.items():
-            print(f"    {cat:20s} clean={d['clean_capture_rate']:.2f} catch={d['catch_rate']}")
+            print(f"    {cat:20s} clean={d['clean_capture_rate']:.2f} catch={f2(d['catch_rate'])}")
 
     OUT.mkdir(parents=True, exist_ok=True)
     rec = {
@@ -66,7 +69,7 @@ def main():
         "note": "v2 Family N CTF Red/Blue; mechanics demo, not a monitor certification",
     }
     path = OUT / "ctf_red_blue_mock.json"
-    path.write_text(json.dumps(rec, indent=2, default=str))
+    path.write_text(json.dumps(rec, indent=2, default=str) + "\n")
     print(f"\nwrote {path}")
 
 
