@@ -6,8 +6,10 @@
 
 **An evaluation suite for Natural Language Autoencoders (NLAs).**
 
+[![CI](https://github.com/SolshineCode/NLAttack/actions/workflows/ci.yml/badge.svg)](https://github.com/SolshineCode/NLAttack/actions/workflows/ci.yml)
 ![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)
 ![version](https://img.shields.io/badge/release-v2.0.0-brightgreen.svg)
+![python](https://img.shields.io/badge/python-3.9%2B-blue.svg)
 ![status](https://img.shields.io/badge/status-research%20software-orange.svg)
 
 A **Natural Language Autoencoder** explains a model's internal state in plain
@@ -61,6 +63,10 @@ concepts). The local Gemma-4-E2B NLA is the mirror image — its bottleneck prob
 near-perfectly in-distribution but its verbalizer is weak and domain-specific.
 Separating those two failure modes is the point of the suite.
 
+**Add your NLA.** Implement one adapter method, run the suite, and open a PR with
+your result — see [CONTRIBUTING.md](CONTRIBUTING.md). Results are attributed to the
+NLA (not the base model) and reported only when they clear a null control.
+
 ## What's inside
 
 - **A 128-plan catalog across 14 families (A–N).** Every plan is a falsifiable test
@@ -89,6 +95,7 @@ Separating those two failure modes is the point of the suite.
 | [docs/RESULTS.md](docs/RESULTS.md) | Reproducible findings, the leaderboard, and the attribution convention |
 | [docs/CTF_RED_BLUE.md](docs/CTF_RED_BLUE.md) | The v2 Red/Blue capture-the-flag family (Family N) |
 | [CHANGELOG.md](CHANGELOG.md) · [docs/VERSIONING.md](docs/VERSIONING.md) | Release history and the freeze-on-release policy |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to submit your NLA's result or extend the harness |
 | [DESIGN_REVIEW.md](DESIGN_REVIEW.md) · [docs/LITERATURE.md](docs/LITERATURE.md) | Validity threats; the reading list with arXiv ids |
 
 ## How to cite
