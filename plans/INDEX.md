@@ -1,12 +1,18 @@
-# NLA Evaluation Plans — Master Index (P001–P118)
+# NLA Evaluation Plans — Master Index (P001–P128)
 
-118 plans across 13 families. Schema/themes: `README.md`. Feasibility: high/medium/frontier.
+**128 plans across 14 families (v2).** Families A–M (P001–P118) are the frozen v1
+catalog; Family N (P119–P128) is new in v2. Schema/themes: `README.md`.
+Feasibility: high/medium/frontier.
 
-**Feasibility mix:** high=44 · medium=58 · frontier=15 · mixed=1
+**Feasibility mix (A–M):** high=44 · medium=58 · frontier=15 · mixed=1
+
+> New in v2: **Family N — CTF Red/Blue** (P119–P128, `N_ctf_red_blue.md` +
+> `nla_eval/ctf.py` + `docs/CTF_RED_BLUE.md`). Listed at the bottom of this file.
 
 > Small/weak NLA? `RUDIMENTARY_TIERS.md`. Emergence: Family K + `nla_eval/emergence.py`.
 > AV-conditioning (track training): `nla_eval/verbalizer_axes.py` + `docs/AV_CONDITIONING_AXES.md`.
 > Deception/misalignment monitoring: Family M + `nla_eval/deception.py`.
+> CTF Red/Blue (deception capture-the-flag): Family N + `nla_eval/ctf.py` + `docs/CTF_RED_BLUE.md`.
 
 
 ## Family A — Concept-survival & dropout-map  (`A_*.md`)
@@ -191,3 +197,28 @@
 | P116 | Cross-scenario deception transfer | high |
 | P117 | Specificity / adversarial control (is it deception, or noise?) | high |
 | P118 | Same-prompt behavioral-split integrity gate | high |
+
+---
+
+## New in v2 (families A–M above are the frozen v1 catalog)
+
+## Family N — CTF Red/Blue (deception capture-the-flag)  (`N_ctf_red_blue.md`)
+
+A game-theoretic packaging of Families G + M: a Red model pursues a hidden
+misaligned objective (the flag) while a Blue NLA-monitor reads the AV text to catch
+it. Reports an adversarial scoreboard (`nla_eval/ctf.py`). Control-tier game runs
+today vs MockNLA; primary tier needs the bottleneck probe (work item E). See
+`docs/CTF_RED_BLUE.md`.
+
+| ID | Title | Feasibility |
+|----|-------|-------------|
+| P119 | Clean-capture rate (the Red headline) | medium (control today) |
+| P120 | Monitor catch rate / detection recall (the Blue headline) | medium (control today) |
+| P121 | Stealth gap as a game score (probe − AV) | medium (control today) |
+| P122 | Evasion cost: queries to first clean capture | medium (control today) |
+| P123 | Escalation ladder: capture rate vs Red sophistication tier | medium |
+| P124 | Category-resolved capture map (which deception types slip through) | medium |
+| P125 | Honeypot / false-alarm rate (Blue cries wolf) | high |
+| P126 | Multi-round co-evolution (does Blue's recall decay as Red adapts?) | medium |
+| P127 | Winning-strategy transfer across monitors (a universal exploit) | frontier |
+| P128 | Same-behavior integrity gate for the CTF (control vs primary) | high |

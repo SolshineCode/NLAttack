@@ -34,7 +34,7 @@ CELL "TWO ACCESS TIERS":
 CELL "BUILT FOR HONESTY":
 - Works on WEAK / TINY / EARLY NLAs
 - NULL CONTROLS on every result (beat a permutation floor)
-- 118 EVALUATIONS in 13 FAMILIES
+- 128 EVALUATIONS in 14 FAMILIES
 - small gloss line under it: "each evaluation = a test with a hypothesis, a metric, and a null-control baseline"
 
 CELL "HEADLINE FINDING" (a tiny labeled bar contrast):

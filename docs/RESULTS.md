@@ -5,7 +5,12 @@ attribution convention, and the benchmark graphs. For concepts see
 [METHODOLOGY.md](METHODOLOGY.md); for the eval catalog see
 [EVALUATIONS.md](EVALUATIONS.md).
 
-## Reproducible findings to date
+> **Generations.** The findings in this section are the **v1** benchmark and are
+> **frozen** — v2 carries them forward unchanged. v2's own additions are in
+> [v2 additions](#v2-additions) below. Artifact provenance per generation:
+> [`../results/README.md`](../results/README.md).
+
+## Reproducible findings to date (v1, frozen)
 
 These come with the suite (`results/`) and are stated with their caveats. Results
 are named by the NLA, not the base model (see the attribution section below).
@@ -94,6 +99,35 @@ The detail bullets, with caveats:
 
 Numbers from the hosted API can change under a fixed source id (the backend is
 redeployed), which is exactly why results are attributed and dated.
+
+
+## v2 additions
+
+Additive to the frozen v1 results above; nothing here changes a v1 number.
+
+**CTF Red/Blue (Family N), control-tier demo.** The offline mechanics demo
+(`results/ctf/ctf_red_blue_mock.json`, reproduced by
+`python experiments/ctf_red_blue_demo.py`) plays an adaptive laundering Red team
+against a Blue monitor built on the deliberately weak `MockNLA`. Against a naive
+(plain-statement) Red, the monitor busts only a fraction of attempts — the lossy
+bottleneck has already dropped most tells; against the adaptive Red, the catch rate
+falls to ~0 within a couple of queries while the clean-capture rate goes to ~1.
+
+This is a **control-tier** result by the integrity gate (P128): the capture oracle
+is the model-agnostic survival proxy over **constructed** flags, so it demonstrates
+the game mechanics and the verbalizer blind spot, **not** a monitor certification. A
+**primary-tier** result — the number a deployer should weigh — requires a real
+bottleneck-probe oracle over the model's own honest-vs-deceptive behavior
+(`ctf.probe_capture_oracle`), gated on a local NLA + GPU. The exact rates from the
+weak `MockNLA` are illustrative and should not be read as a monitor score.
+
+**Domain-aware contrastive Gemma-4-E2B verbalizer (honest negative).** The
+domain-aware-contrastive AV variant
+(`results/local_gemma_e2b/domainaware_nla_verbalizer_axes.json`) improves
+likelihood-based domain routing, but its *generation*-based minimal-pair AUC stays
+at chance (0.491 vs a 0.531 v1 baseline): the verbalizer routes domain without its
+generations carrying distinguishing within-domain content. Reported as a negative,
+per the suite's null-control discipline.
 
 
 ## Result attribution: name results by the NLA, not the base model

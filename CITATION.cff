@@ -6,15 +6,16 @@ abstract: >-
   interpretability methods that verbalize a model's internal activations into
   human-readable text and reconstruct them. It scores both the bottleneck
   (activation) and the verbalizer sides with explicit null controls, works on
-  weak or early-training NLAs, and includes a 118-plan catalog across 13
-  families plus deception/misalignment monitoring.
+  weak or early-training NLAs, and includes (as of v2) a 128-plan catalog across
+  14 families spanning concept survival, misuse detection, deception/misalignment
+  monitoring, and an adversarial Red/Blue capture-the-flag family.
 type: software
 authors:
   - family-names: DeLeeuw
     given-names: Caleb
     alias: SolshineCode
     email: caleb.deleeuw@gmail.com
-version: "0.1.0"
+version: "2.0.0"
 license: Apache-2.0
 url: "https://github.com/SolshineCode/NLAttack"
 repository-code: "https://github.com/SolshineCode/NLAttack"
